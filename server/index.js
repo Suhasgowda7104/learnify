@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { testConnection } from './config/database.config.js';
+import { syncDatabase } from './src/models/index.js';
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +36,7 @@ app.listen(PORT, async () => {
   const dbConnected = await testConnection();
   if (dbConnected) {
     console.log('✅ Database connected');
+    await syncDatabase();
   } else {
     console.log('❌ Failed to connect to database');
   }

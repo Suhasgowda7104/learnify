@@ -1,27 +1,28 @@
-import * as pg from 'pg';
+import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
 dotenv.config({ quiet: true });
 
-const { Pool } = pg;
-
-const pool = new Pool({
+// Create Sequelize instance for PostgreSQL
+const sequelize = new Sequelize({
+  dialect: 'postgres',
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT) || 5432,
   database: process.env.DB_NAME,
-  user: process.env.DB_USER,
+  username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-});
-
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle database client:', err);
-  process.exit(-1);
+  logging: console.log, // Set to false in production
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
 });
 
 export async function testConnection() {
   try {
-    const client = await pool.connect();
-    client.release();
+    await sequelize.authenticate();
     console.log('Database connection successful.');
     return true;
   } catch (err) {
@@ -30,14 +31,5 @@ export async function testConnection() {
   }
 }
 
-export async function query(text, params) {
-  try {
-    const res = await pool.query(text, params);
-    return res;
-  } catch (err) {
-    console.error('Query error:', err.message);
-    throw err;
-  }
-}
-
-export default pool;
+export { sequelize };
+export default sequelize;
