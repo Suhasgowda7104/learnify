@@ -34,7 +34,7 @@ app.listen(PORT, async () => {
   // Test database connection on startup
   const dbConnected = await testConnection();
   if (dbConnected) {
-    console.log('✅ Database connection established successfully');
+    console.log('✅ Database connected');
   } else {
     console.log('❌ Failed to connect to database');
   }
