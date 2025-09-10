@@ -1,34 +1,36 @@
-import pkg from 'pg';
-const { Pool } = pkg;
+import * as pg from 'pg';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ quiet: true });
+
+const { Pool } = pg;
 
 const pool = new Pool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT) || 5432,
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD
+  password: process.env.DB_PASSWORD,
 });
 
 pool.on('error', (err) => {
-  console.error('Database error:', err);
+  console.error('Unexpected error on idle database client:', err);
   process.exit(-1);
 });
 
-export const testConnection = async () => {
+export async function testConnection() {
   try {
     const client = await pool.connect();
     client.release();
+    console.log('Database connection successful.');
     return true;
   } catch (err) {
     console.error('Database connection failed:', err.message);
     return false;
   }
-};
+}
 
-export const query = async (text, params) => {
+export async function query(text, params) {
   try {
     const res = await pool.query(text, params);
     return res;
@@ -36,6 +38,6 @@ export const query = async (text, params) => {
     console.error('Query error:', err.message);
     throw err;
   }
-};
+}
 
 export default pool;
