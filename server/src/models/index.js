@@ -44,10 +44,10 @@ db.Sequelize = Sequelize;
 const syncDatabase = async (force = false) => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Database connection established successfully.');
+    // console.log('✅ Database connection established successfully.');
     
     await sequelize.sync({ force, alter: !force });
-    console.log('✅ Database synchronized successfully.');
+    // console.log('✅ Database synchronized successfully.');
     
     return true;
   } catch (error) {

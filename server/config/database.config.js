@@ -11,7 +11,7 @@ const sequelize = new Sequelize({
   database: process.env.DB_NAME,
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  logging: console.log, // Set to false in production
+  logging: false,
   pool: {
     max: 5,
     min: 0,
