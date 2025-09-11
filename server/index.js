@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import { testConnection } from './config/database.config.js';
 import { syncDatabase } from './src/models/index.js';
 import authRoutes from './src/routes/auth.route.js';
@@ -9,6 +10,14 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// CORS configuration
+app.use(cors({
+  origin: ['http://localhost:4200', 'http://127.0.0.1:4200'], // Angular dev server
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Middleware
 app.use(express.json());
