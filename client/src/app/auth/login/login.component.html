@@ -1,69 +1,77 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h2>Welcome Back</h2>
-      <p>Sign in to your Learnify account</p>
+<div class="auth-container">
+  <div class="auth-header">
+    <h1 class="brand-title">Learnify</h1>
+    <p class="brand-subtitle">Login or create an account to get started</p>
+  </div>
+
+  <div class="auth-tabs">
+    <button class="tab-button active" routerLink="/login">Login</button>
+    <button class="tab-button" routerLink="/register">Register</button>
+  </div>
+
+  <div class="auth-card">
+    <div class="card-header">
+      <h2>Login</h2>
+      <p>Enter your credentials to access your account</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <!-- Email Field -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
       <div class="form-group">
-        <label for="email">Email Address</label>
+        <label for="email">Email</label>
         <input
           type="email"
           id="email"
           formControlName="email"
-          class="form-control"
-          [class.is-invalid]="isFieldInvalid('email')"
+          class="form-input"
+          [class.error]="isFieldInvalid('email')"
           placeholder="Enter your email"
         />
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
-          {{ getFieldError('email') }}
+        <div class="error-message" *ngIf="isFieldInvalid('email')">
+          <div *ngIf="loginForm.get('email')?.errors?.['required']">
+            Email is required
+          </div>
+          <div *ngIf="loginForm.get('email')?.errors?.['email']">
+            Please enter a valid email
+          </div>
         </div>
       </div>
 
-      <!-- Password Field -->
       <div class="form-group">
         <label for="password">Password</label>
         <input
           type="password"
           id="password"
           formControlName="password"
-          class="form-control"
-          [class.is-invalid]="isFieldInvalid('password')"
+          class="form-input"
+          [class.error]="isFieldInvalid('password')"
           placeholder="Enter your password"
         />
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
-          {{ getFieldError('password') }}
+        <div class="error-message" *ngIf="isFieldInvalid('password')">
+          <div *ngIf="loginForm.get('password')?.errors?.['required']">
+            Password is required
+          </div>
+          <div *ngIf="loginForm.get('password')?.errors?.['minlength']">
+            Password must be at least 6 characters
+          </div>
         </div>
       </div>
 
-      <!-- Error Message -->
-      <div class="alert alert-danger" *ngIf="errorMessage">
-        <i class="fas fa-exclamation-circle"></i>
+      <div class="alert error" *ngIf="errorMessage">
         {{ errorMessage }}
       </div>
 
-      <!-- Success Message -->
-      <div class="alert alert-success" *ngIf="successMessage">
-        <i class="fas fa-check-circle"></i>
+      <div class="alert success" *ngIf="successMessage">
         {{ successMessage }}
       </div>
 
-      <!-- Submit Button -->
       <button
         type="submit"
-        class="btn btn-primary btn-block"
-        [disabled]="isLoading"
+        class="submit-button"
+        [disabled]="loginForm.invalid || isLoading"
       >
-        <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        <span *ngIf="!isLoading">Sign In</span>
-        <span *ngIf="isLoading">Signing In...</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ isLoading ? 'Signing in...' : 'Login' }}
       </button>
     </form>
-
-    <div class="login-footer">
-      <p>Don't have an account? <a routerLink="/register" class="register-link">Sign up here</a></p>
-    </div>
   </div>
 </div>
