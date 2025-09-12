@@ -5,14 +5,13 @@ import { testConnection } from './config/database.config.js';
 import { syncDatabase } from './src/models/index.js';
 import authRoutes from './src/routes/auth.route.js';
 import courseRoutes from './src/routes/course.routes.js';
+import adminRoutes from './src/routes/admin.routes.js';
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS configuration
 app.use(cors({
   origin: ['http://localhost:4200', 'http://127.0.0.1:4200'], // Angular dev server
   credentials: true,
@@ -20,11 +19,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Original-Password']
 }));
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// HTTP request logging middleware with status code
 app.use((req, res, next) => {
   const startTime = Date.now();
   const originalSend = res.send;
@@ -38,16 +35,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes with API versioning
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/courses', courseRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
-// Basic route
 app.get('/', (req, res) => {
   res.json({ message: 'Learnify Server is running!' });
 });
 
-// API v1 routes
 app.get('/api/v1', (req, res) => {
   res.json({ 
     message: 'Learnify API v1',
@@ -59,7 +54,6 @@ app.get('/api/v1', (req, res) => {
   });
 });
 
-// Health check route
 app.get('/api/v1/health', async (req, res) => {
   const dbStatus = await testConnection();
   res.json({ 
@@ -70,11 +64,9 @@ app.get('/api/v1/health', async (req, res) => {
   });
 });
 
-// Start server and test database connection
 app.listen(PORT, async () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   
-  // Test database connection on startup
   const dbConnected = await testConnection();
   if (dbConnected) {
     console.log('✅ Database connected');

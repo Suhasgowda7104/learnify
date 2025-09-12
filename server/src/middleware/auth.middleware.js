@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../config/jwt.config.js';
+import { jwtConfig } from '../../config/jwt.config.js';
 import db from '../models/index.js';
 
 const { User, Role } = db;
@@ -20,7 +20,7 @@ export const authenticateToken = async (req, res, next) => {
     }
 
     // Verify the token
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, jwtConfig.secret);
     
     // Find user in database
     const user = await User.findByPk(decoded.userId, {
@@ -39,7 +39,7 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
-    if (!user.is_active) {
+    if (!user.isActive) {
       return res.status(401).json({
         success: false,
         message: 'Account is deactivated'
@@ -77,21 +77,36 @@ export const authenticateToken = async (req, res, next) => {
  */
 export const requireRole = (roleName) => {
   return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      if (!req.user.role) {
+        return res.status(403).json({
+          success: false,
+          message: 'User role not found'
+        });
+      }
+
+      if (req.user.role.name !== roleName) {
+        return res.status(403).json({
+          success: false,
+          message: `Access denied. ${roleName} role required`
+        });
+      }
+
+      next();
+    } catch (error) {
+      console.error('Role verification error:', error);
+      return res.status(500).json({
         success: false,
-        message: 'Authentication required'
+        message: 'Internal server error in role verification'
       });
     }
-
-    if (req.user.role.name !== roleName) {
-      return res.status(403).json({
-        success: false,
-        message: `Access denied. ${roleName} role required`
-      });
-    }
-
-    next();
   };
 };
 
@@ -100,21 +115,36 @@ export const requireRole = (roleName) => {
  */
 export const requireAnyRole = (roleNames) => {
   return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      if (!req.user.role) {
+        return res.status(403).json({
+          success: false,
+          message: 'User role not found'
+        });
+      }
+
+      if (!roleNames.includes(req.user.role.name)) {
+        return res.status(403).json({
+          success: false,
+          message: `Access denied. One of these roles required: ${roleNames.join(', ')}`
+        });
+      }
+
+      next();
+    } catch (error) {
+      console.error('Role verification error:', error);
+      return res.status(500).json({
         success: false,
-        message: 'Authentication required'
+        message: 'Internal server error in role verification'
       });
     }
-
-    if (!roleNames.includes(req.user.role.name)) {
-      return res.status(403).json({
-        success: false,
-        message: `Access denied. One of these roles required: ${roleNames.join(', ')}`
-      });
-    }
-
-    next();
   };
 };
 
@@ -182,7 +212,7 @@ export const optionalAuth = async (req, res, next) => {
       return next();
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, jwtConfig.secret);
     const user = await User.findByPk(decoded.userId, {
       include: [{
         model: Role,
@@ -192,7 +222,7 @@ export const optionalAuth = async (req, res, next) => {
       attributes: { exclude: ['password'] }
     });
 
-    req.user = user && user.is_active ? user : null;
+    req.user = user && user.isActive ? user : null;
     next();
   } catch (error) {
     // If token is invalid, just continue without user
