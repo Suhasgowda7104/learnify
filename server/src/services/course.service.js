@@ -11,39 +11,20 @@ class CourseService {
    * @param {Object} courseData - Course creation data
    * @param {string} courseData.title - Course title
    * @param {string} courseData.description - Course description
-   * @param {string} courseData.instructorId - Instructor's user ID
    * @returns {Object} Created course data
    */
   async createCourse(courseData) {
-    const { title, description, instructorId } = courseData;
+    const { title, description } = courseData;
 
     // Validate required fields
-    if (!title || !description || !instructorId) {
-      throw new Error('Title, description, and instructor ID are required');
-    }
-
-    // Verify instructor exists and has admin role
-    const instructor = await User.findByPk(instructorId, {
-      include: [{
-        model: Role,
-        as: 'role',
-        attributes: ['name']
-      }]
-    });
-
-    if (!instructor) {
-      throw new Error('Instructor not found');
-    }
-
-    if (instructor.role.name !== 'admin') {
-      throw new Error('Only admin users can create courses');
+    if (!title || !description) {
+      throw new Error('Title and description are required');
     }
 
     // Create new course
     const newCourse = await Course.create({
       title,
       description,
-      instructorId,
       isActive: true
     });
 
@@ -52,33 +33,22 @@ class CourseService {
 
   /**
    * Get all active courses
-   * @returns {Array} List of active courses with instructor info
+   * @returns {Array} List of active courses
    */
   async getAllActiveCourses() {
     return await Course.findAll({
       where: { isActive: true },
-      include: [{
-        model: User,
-        as: 'instructor',
-        attributes: ['id', 'firstName', 'lastName', 'email']
-      }],
-      order: [['createdAt', 'DESC']]
+      order: [['created_at', 'DESC']]
     });
   }
 
   /**
    * Get course by ID
    * @param {string} courseId - Course ID
-   * @returns {Object|null} Course data with instructor info or null if not found
+   * @returns {Object|null} Course data or null if not found
    */
   async getCourseById(courseId) {
-    return await Course.findByPk(courseId, {
-      include: [{
-        model: User,
-        as: 'instructor',
-        attributes: ['id', 'firstName', 'lastName', 'email']
-      }]
-    });
+    return await Course.findByPk(courseId);
   }
 
   /**
@@ -95,7 +65,7 @@ class CourseService {
       throw new Error('Course not found');
     }
 
-    // Verify requester is the instructor or admin
+    // Verify requester is admin
     const requester = await User.findByPk(requesterId, {
       include: [{
         model: Role,
@@ -108,11 +78,8 @@ class CourseService {
       throw new Error('Requester not found');
     }
 
-    const isInstructor = course.instructorId === requesterId;
-    const isAdmin = requester.role.name === 'admin';
-
-    if (!isInstructor && !isAdmin) {
-      throw new Error('Only the course instructor or admin can update this course');
+    if (requester.role.name !== 'admin') {
+      throw new Error('Only admin users can update courses');
     }
 
     // Update course
@@ -151,22 +118,7 @@ class CourseService {
     return true;
   }
 
-  /**
-   * Get courses by instructor
-   * @param {string} instructorId - Instructor's user ID
-   * @returns {Array} List of courses by instructor
-   */
-  async getCoursesByInstructor(instructorId) {
-    return await Course.findAll({
-      where: { instructorId },
-      include: [{
-        model: User,
-        as: 'instructor',
-        attributes: ['id', 'firstName', 'lastName', 'email']
-      }],
-      order: [['createdAt', 'DESC']]
-    });
-  }
+
 
   /**
    * Search courses by title or description
@@ -184,12 +136,7 @@ class CourseService {
           { description: { [Op.iLike]: `%${searchTerm}%` } }
         ]
       },
-      include: [{
-        model: User,
-        as: 'instructor',
-        attributes: ['id', 'firstName', 'lastName', 'email']
-      }],
-      order: [['createdAt', 'DESC']]
+      order: [['created_at', 'DESC']]
     });
   }
 }

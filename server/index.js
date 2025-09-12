@@ -4,6 +4,7 @@ import cors from 'cors';
 import { testConnection } from './config/database.config.js';
 import { syncDatabase } from './src/models/index.js';
 import authRoutes from './src/routes/auth.route.js';
+import courseRoutes from './src/routes/course.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -16,7 +17,7 @@ app.use(cors({
   origin: ['http://localhost:4200', 'http://127.0.0.1:4200'], // Angular dev server
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Original-Password']
 }));
 
 // Middleware
@@ -39,6 +40,7 @@ app.use((req, res, next) => {
 
 // Routes with API versioning
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/courses', courseRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
