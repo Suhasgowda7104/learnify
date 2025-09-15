@@ -6,6 +6,7 @@ import { syncDatabase } from './src/models/index.js';
 import authRoutes from './src/routes/auth.route.js';
 import courseRoutes from './src/routes/course.routes.js';
 import adminRoutes from './src/routes/admin.routes.js';
+import studentRoutes from './src/routes/student.routes.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use((req, res, next) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/student', studentRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Learnify Server is running!' });
