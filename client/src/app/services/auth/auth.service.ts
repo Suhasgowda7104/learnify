@@ -105,20 +105,20 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return sessionStorage.getItem(this.tokenKey);
   }
 
   private setAuthData(token: string, user: User): void {
-    localStorage.setItem(this.tokenKey, token);
-    localStorage.setItem('learnify_user', JSON.stringify(user));
+    sessionStorage.setItem(this.tokenKey, token);
+    sessionStorage.setItem('learnify_user', JSON.stringify(user));
     this.currentUserSubject.next(user);
     console.log('Session data stored successfully:', { token: token.substring(0, 20) + '...', user });
   }
 
 
   private clearAuthData(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem('learnify_user');
+    sessionStorage.removeItem(this.tokenKey);
+    sessionStorage.removeItem('learnify_user');
     this.currentUserSubject.next(null);
   }
 
@@ -143,7 +143,7 @@ export class AuthService {
 
   private checkExistingAuth(): void {
     const token = this.getToken();
-    const userStr = localStorage.getItem('learnify_user');
+    const userStr = sessionStorage.getItem('learnify_user');
     
     if (token && userStr && !this.isTokenExpired(token)) {
       try {
