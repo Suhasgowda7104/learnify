@@ -1,1 +1,153 @@
-<p>course-form works!</p>
+<div class="min-h-screen bg-background" *ngIf="!embedded">
+  <app-header 
+    title="Admin Dashboard" 
+    subtitle="Manage your courses"
+    [showUserInfo]="true">
+  </app-header>
+
+  <main class="main-content">
+    <div class="page-header">
+      <button class="btn btn-outline back-button" (click)="onCancel()">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Course Details
+      </button>
+      <h1 class="page-title">{{ isEditMode ? 'Edit Course' : 'Create New Course' }}</h1>
+    </div>
+
+    <div class="form-card">
+      <div class="card-header">
+        <h2 class="card-title">Course Information</h2>
+      </div>
+      
+      <div class="card-content">
+        <ng-container *ngTemplateOutlet="courseFormTemplate"></ng-container>
+      </div>
+    </div>
+  </main>
+
+  <app-footer></app-footer>
+</div>
+
+<div class="embedded-form" *ngIf="embedded">
+  <ng-container *ngTemplateOutlet="courseFormTemplate"></ng-container>
+</div>
+
+<ng-template #courseFormTemplate>
+  <form class="course-form" [formGroup]="courseForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="courseName">Course Name *</label>
+      <input 
+        type="text" 
+        id="courseName" 
+        formControlName="title"
+        placeholder="Enter course name" 
+        [class.error]="isFieldInvalid('title')"
+        class="form-input">
+      <div class="error-message" *ngIf="isFieldInvalid('title')">
+        {{ getFieldError('title') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Course Description *</label>
+      <textarea 
+        id="description" 
+        formControlName="description"
+        placeholder="Enter course description" 
+        rows="3" 
+        [class.error]="isFieldInvalid('description')"
+        class="form-textarea">
+      </textarea>
+      <div class="error-message" *ngIf="isFieldInvalid('description')">
+        {{ getFieldError('description') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="content">Course Content *</label>
+      <textarea 
+        id="content" 
+        placeholder="Enter detailed course content and curriculum" 
+        rows="4" 
+        class="form-textarea">
+      </textarea>
+      <div class="help-text">
+        Describe the course curriculum, learning objectives, and what students will achieve.
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="duration">Duration *</label>
+        <input 
+          type="text" 
+          id="duration" 
+          formControlName="durationHours"
+          placeholder="e.g., 8 weeks" 
+          [class.error]="isFieldInvalid('durationHours')"
+          class="form-input">
+        <div class="error-message" *ngIf="isFieldInvalid('durationHours')">
+          {{ getFieldError('durationHours') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price *</label>
+        <input 
+          type="text" 
+          id="price" 
+          formControlName="price"
+          placeholder="e.g., $299" 
+          [class.error]="isFieldInvalid('price')"
+          class="form-input">
+        <div class="error-message" *ngIf="isFieldInvalid('price')">
+          {{ getFieldError('price') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          formControlName="isActive"
+          class="form-checkbox"
+        />
+        <span class="checkmark"></span>
+        Course is active and available for enrollment
+      </label>
+    </div>
+
+    <div class="alert error" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="alert success" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-outline cancel-btn"
+        (click)="onCancel()"
+        [disabled]="isLoading"
+        *ngIf="!embedded">
+        Cancel
+      </button>
+      
+      <button 
+        type="submit" 
+        class="btn btn-primary submit-btn"
+        [disabled]="courseForm.invalid || isLoading">
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ isLoading 
+            ? (isEditMode ? 'Updating...' : 'Creating...') 
+            : (isEditMode ? 'Update Course' : 'Create Course') 
+        }}
+      </button>
+    </div>
+  </form>
+</ng-template>

@@ -24,9 +24,13 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     
-    // Redirect if already authenticated
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      const user = this.authService.getCurrentUser();
+      if (user?.role === 'admin') {
+        this.router.navigate(['/admin']);
+      } else {
+        this.router.navigate(['/student']);
+      }
     }
   }
 
@@ -40,7 +44,6 @@ export class RegisterComponent implements OnInit {
     }, { validators: this.passwordMatchValidator });
   }
 
-  // Custom validator to check if passwords match
   private passwordMatchValidator(form: FormGroup) {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
@@ -75,20 +78,52 @@ export class RegisterComponent implements OnInit {
       this.authService.register(registerData).subscribe({
         next: (response) => {
           this.isLoading = false;
+          console.log('Registration response received:', response);
+          console.log('Response structure:', {
+            success: response.success,
+            hasData: !!response.data,
+            dataStructure: response.data ? Object.keys(response.data) : 'no data'
+          });
+          
           if (response.success) {
             this.successMessage = response.message;
-            // Redirect to dashboard after successful registration
-            setTimeout(() => {
-              this.router.navigate(['/dashboard']);
-            }, 1000);
+            
+            if (response.data && response.data.user) {
+              const user = response.data.user;
+              console.log('User data found:', user);
+              
+              setTimeout(() => {
+                if (user.role === 'admin') {
+                  this.router.navigate(['/admin']);
+                } else {
+                  this.router.navigate(['/student']);
+                }
+              }, 1000);
+            } else {
+              console.warn('No user data in response, redirecting to login');
+              setTimeout(() => {
+                this.router.navigate(['/login']);
+              }, 1000);
+            }
           } else {
             this.errorMessage = response.message || 'Registration failed';
+            console.error('Registration failed:', response);
           }
         },
         error: (error) => {
           this.isLoading = false;
-          this.errorMessage = error.error?.message || 'An error occurred during registration';
-          console.error('Registration error:', error);
+          console.error('Registration HTTP error:', error);
+          console.error('Error status:', error.status);
+          console.error('Error body:', error.error);
+          
+          let errorMessage = 'An error occurred during registration';
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          this.errorMessage = errorMessage;
         }
       });
     } else {
@@ -103,7 +138,6 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Getter methods for easy access in template
   get firstName() {
     return this.registerForm.get('firstName');
   }
@@ -124,7 +158,6 @@ export class RegisterComponent implements OnInit {
     return this.registerForm.get('confirmPassword');
   }
 
-  // Helper methods for validation display
   isFieldInvalid(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));

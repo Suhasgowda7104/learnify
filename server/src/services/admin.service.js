@@ -1,17 +1,21 @@
 import db from '../models/index.js';
+import { Op } from 'sequelize';
 
 const { Course, User, Enrollment, sequelize } = db;
 
 class AdminService {
-
+  // Create a new course
   async createCourse(courseData) {
     try {
       const course = await Course.create({
         title: courseData.title,
         description: courseData.description,
+        category: courseData.category,
+        level: courseData.level,
         price: courseData.price,
-        durationHours: courseData.durationHours,
-        isActive: courseData.isActive !== undefined ? courseData.isActive : true
+        duration: courseData.duration,
+        thumbnail: courseData.thumbnail,
+        is_active: courseData.is_active !== undefined ? courseData.is_active : true
       });
       return course;
     } catch (error) {
@@ -19,7 +23,7 @@ class AdminService {
     }
   }
 
-
+  // Update an existing course
   async updateCourse(courseId, updateData) {
     try {
       const course = await Course.findByPk(courseId);
@@ -34,7 +38,7 @@ class AdminService {
     }
   }
 
-
+  // Delete a course
   async deleteCourse(courseId) {
     try {
       const course = await Course.findByPk(courseId);
@@ -61,7 +65,7 @@ class AdminService {
     }
   }
 
-
+  // Get all courses with enrollment counts
   async getAllCoursesWithEnrollmentCounts() {
     try {
       const courses = await Course.findAll({
@@ -90,6 +94,7 @@ class AdminService {
     }
   }
 
+  // Get students enrolled in a specific course
   async getEnrollmentsByCourse(courseId) {
     try {
       const course = await Course.findByPk(courseId);
@@ -145,7 +150,7 @@ class AdminService {
     }
   }
 
-
+  // Get course statistics
   async getCourseStats() {
     try {
       const totalCourses = await Course.count();

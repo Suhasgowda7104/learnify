@@ -50,8 +50,24 @@ class AuthService {
       isActive: true
     });
 
-    // Return user data without password
-    return this.sanitizeUserData(newUser);
+    const userWithRole = await User.findByPk(newUser.id, {
+      include: [{
+        model: Role,
+        as: 'role',
+        attributes: ['name']
+      }]
+    });
+
+    const token = generateToken({
+      userId: userWithRole.id,
+      email: userWithRole.email,
+      role: userWithRole.role.name
+    });
+
+    return {
+      user: this.sanitizeUserDataWithRole(userWithRole),
+      token
+    };
   }
 
   /**

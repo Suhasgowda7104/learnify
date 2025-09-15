@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 
 export interface User {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -43,13 +43,9 @@ export class AuthService {
   private tokenKey = 'learnify_token';
 
   constructor(private http: HttpClient) {
-    // Check if user is already logged in on service initialization
     this.checkExistingAuth();
   }
 
-  /**
-   * Register a new student
-   */
   register(userData: RegisterData): Observable<AuthResponse> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
@@ -58,16 +54,21 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData, { headers })
       .pipe(
         tap(response => {
+          console.log('AuthService - Raw registration response:', response);
           if (response.success && response.data) {
+            console.log('AuthService - Setting auth data:', response.data);
             this.setAuthData(response.data.token, response.data.user);
+          } else {
+            console.warn('AuthService - Response missing data:', response);
           }
+        }),
+        catchError(error => {
+          console.error('AuthService - Registration error:', error);
+          throw error;
         })
       );
   }
 
-  /**
-   * Login user
-   */
   login(credentials: LoginData): Observable<AuthResponse> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
@@ -83,9 +84,6 @@ export class AuthService {
       );
   }
 
-  /**
-   * Logout user
-   */
   logout(): Observable<AuthResponse> {
     const headers = this.getAuthHeaders();
     
@@ -97,49 +95,33 @@ export class AuthService {
       );
   }
 
-  /**
-   * Check if user is authenticated
-   */
   isAuthenticated(): boolean {
     const token = this.getToken();
     return !!token && !this.isTokenExpired(token);
   }
 
-  /**
-   * Get current user
-   */
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
 
-  /**
-   * Get stored token
-   */
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
 
-  /**
-   * Set authentication data
-   */
   private setAuthData(token: string, user: User): void {
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem('learnify_user', JSON.stringify(user));
     this.currentUserSubject.next(user);
+    console.log('Session data stored successfully:', { token: token.substring(0, 20) + '...', user });
   }
 
-  /**
-   * Clear authentication data
-   */
+
   private clearAuthData(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem('learnify_user');
     this.currentUserSubject.next(null);
   }
 
-  /**
-   * Get authorization headers
-   */
   private getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders({
@@ -148,22 +130,17 @@ export class AuthService {
     });
   }
 
-  /**
-   * Check if token is expired
-   */
   private isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Math.floor(Date.now() / 1000);
       return payload.exp < currentTime;
     } catch (error) {
+      console.warn('Error checking token expiry:', error);
       return true;
     }
   }
 
-  /**
-   * Check existing authentication on service initialization
-   */
   private checkExistingAuth(): void {
     const token = this.getToken();
     const userStr = localStorage.getItem('learnify_user');
@@ -172,10 +149,13 @@ export class AuthService {
       try {
         const user = JSON.parse(userStr);
         this.currentUserSubject.next(user);
+        console.log('User session restored:', user);
       } catch (error) {
+        console.warn('Error parsing stored user data:', error);
         this.clearAuthData();
       }
     } else {
+      console.log('No valid session found');
       this.clearAuthData();
     }
   }

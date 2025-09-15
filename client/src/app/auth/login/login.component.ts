@@ -24,9 +24,14 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     
-    // Redirect if already authenticated
+
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      const user = this.authService.getCurrentUser();
+      if (user?.role === 'admin') {
+        this.router.navigate(['/admin']);
+      } else {
+        this.router.navigate(['/student']);
+      }
     }
   }
 
@@ -51,14 +56,23 @@ export class LoginComponent implements OnInit {
       this.authService.login(loginData).subscribe({
         next: (response) => {
           this.isLoading = false;
-          if (response.success) {
+          console.log('Login response received:', response);
+          
+          if (response.success && response.data) {
             this.successMessage = response.message;
-            // Redirect to dashboard after successful login
+            const user = response.data.user;
+            console.log('User data:', user);
+            
             setTimeout(() => {
-              this.router.navigate(['/dashboard']);
+              if (user.role === 'admin') {
+                this.router.navigate(['/admin']);
+              } else {
+                this.router.navigate(['/student']);
+              }
             }, 1000);
           } else {
             this.errorMessage = response.message || 'Login failed';
+            console.error('Login failed:', response);
           }
         },
         error: (error) => {
@@ -79,7 +93,6 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Getter methods for easy access in template
   get email() {
     return this.loginForm.get('email');
   }
@@ -88,7 +101,6 @@ export class LoginComponent implements OnInit {
     return this.loginForm.get('password');
   }
 
-  // Helper methods for validation display
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));

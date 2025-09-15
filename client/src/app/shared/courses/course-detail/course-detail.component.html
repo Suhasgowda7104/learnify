@@ -1,1 +1,135 @@
-<p>course-detail works!</p>
+<div class="min-h-screen bg-background">
+  <app-header 
+    title="Admin Dashboard" 
+    subtitle="Manage your courses"
+    [showUserInfo]="true">
+  </app-header>
+
+  <main class="main-content">
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p class="text-muted-foreground">Loading course details...</p>
+    </div>
+
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      <h3>Unable to load course</h3>
+      <p class="text-muted-foreground">{{ errorMessage }}</p>
+      <div class="error-actions">
+        <button class="btn btn-outline" (click)="goBack()">Go Back</button>
+        <button class="btn btn-primary" (click)="loadCourseDetails(courseId!)" *ngIf="courseId">Try Again</button>
+      </div>
+    </div>
+
+    <div class="course-details" *ngIf="course && !isLoading && !errorMessage">
+      <div class="details-header">
+        <button class="btn btn-outline" (click)="goBack()">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Courses
+        </button>
+        <h1 class="flex-1">Course Details</h1>
+        <div class="action-buttons" *ngIf="isAdmin">
+          <button class="btn btn-outline btn-sm" (click)="editCourse()">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+            </svg>
+            Edit
+          </button>
+          <button class="btn btn-destructive btn-sm" (click)="deleteCourse()">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">{{ course.title }}</h2>
+        </div>
+        <div class="card-content details-content">
+          <div class="content-section">
+            <h3>Description</h3>
+            <p class="text-muted-foreground">{{ course.description }}</p>
+          </div>
+          
+          <div class="content-section">
+            <h3>Course Content</h3>
+            <p class="text-muted-foreground">
+              This course provides comprehensive coverage of {{ course.title }} with practical exercises and real-world applications.
+            </p>
+          </div>
+          
+          <div class="details-grid">
+            <div class="detail-item">
+              <h4>Duration</h4>
+              <p class="text-muted-foreground">{{ formatDuration(course.durationHours) }}</p>
+            </div>
+            <div class="detail-item">
+              <h4>Price</h4>
+              <p class="text-muted-foreground">{{ formatPrice(course.price) }}</p>
+            </div>
+            <div class="detail-item">
+              <h4>Course ID</h4>
+              <p class="text-muted-foreground">{{ course.id }}</p>
+            </div>
+            <div class="detail-item">
+              <h4>Status</h4>
+              <p class="text-muted-foreground">{{ course.isActive ? 'Active' : 'Inactive' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="card" *ngIf="isAdmin">
+        <div class="card-header">
+          <h2 class="card-title">Course Management</h2>
+        </div>
+        <div class="card-content">
+          <div class="management-buttons">
+            <button class="btn btn-outline w-full justify-start">Manage Course Content</button>
+            <button class="btn btn-outline w-full justify-start">View Students</button>
+            <button class="btn btn-outline w-full justify-start">Course Analytics</button>
+            <button class="btn btn-outline w-full justify-start">Settings</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" *ngIf="isStudent">
+        <div class="card-header">
+          <h2 class="card-title">Enrollment</h2>
+        </div>
+        <div class="card-content">
+          <div class="enrollment-info">
+            <p class="text-muted-foreground mb-4">
+              Ready to start your learning journey with {{ course.title }}?
+            </p>
+            <button class="btn btn-primary w-full" (click)="enrollInCourse()">
+              Enroll Now - {{ formatPrice(course.price) }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" *ngIf="!isAuthenticated">
+        <div class="card-header">
+          <h2 class="card-title">Get Started</h2>
+        </div>
+        <div class="card-content">
+          <div class="login-info">
+            <p class="text-muted-foreground mb-4">
+              Please log in to enroll in this course and start learning.
+            </p>
+            <button class="btn btn-primary w-full" routerLink="/login">
+              Log In to Enroll
+            </button>
+          </div>
+        </div>
+      </div> -->
+    </div>
+  </main>
+
+  <app-footer></app-footer>
+</div>
