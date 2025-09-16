@@ -1,24 +1,51 @@
 import db from '../models/index.js';
 import { Op } from 'sequelize';
 
-const { Course, User, Enrollment, sequelize } = db;
+const { Course, User, Enrollment, CourseContent, sequelize } = db;
 
 class AdminService {
   // Create a new course
   async createCourse(courseData) {
+    const transaction = await sequelize.transaction();
+    
     try {
+      // Create the course
       const course = await Course.create({
         title: courseData.title,
         description: courseData.description,
         category: courseData.category,
         level: courseData.level,
         price: courseData.price,
-        duration: courseData.duration,
+        duration: courseData.durationHours,
         thumbnail: courseData.thumbnail,
-        is_active: courseData.is_active !== undefined ? courseData.is_active : true
+        is_active: courseData.isActive !== undefined ? courseData.isActive : true
+      }, { transaction });
+
+      // Create course content if provided
+      if (courseData.courseContent && courseData.courseContent.length > 0) {
+        const courseContentData = courseData.courseContent.map(content => ({
+          courseId: course.id,
+          title: content.title,
+          contentType: content.contentType,
+          filePath: content.filePath || null
+        }));
+
+        await CourseContent.bulkCreate(courseContentData, { transaction });
+      }
+
+      await transaction.commit();
+      
+      // Return course with content
+      const courseWithContent = await Course.findByPk(course.id, {
+        include: [{
+          model: CourseContent,
+          as: 'contents'
+        }]
       });
-      return course;
+      
+      return courseWithContent;
     } catch (error) {
+      await transaction.rollback();
       throw new Error(`Failed to create course: ${error.message}`);
     }
   }
@@ -65,34 +92,7 @@ class AdminService {
     }
   }
 
-  // Get all courses with enrollment counts
-  async getAllCoursesWithEnrollmentCounts() {
-    try {
-      const courses = await Course.findAll({
-        attributes: {
-          include: [
-            [
-              sequelize.fn('COUNT', sequelize.col('enrollments.id')),
-              'enrollment_count'
-            ]
-          ]
-        },
-        include: [
-          {
-            model: Enrollment,
-            as: 'enrollments',
-            attributes: [],
-            required: false
-          }
-        ],
-        group: ['Course.id'],
-        order: [['created_at', 'DESC']]
-      });
-      return courses;
-    } catch (error) {
-      throw new Error(`Failed to fetch courses: ${error.message}`);
-    }
-  }
+
 
   // Get students enrolled in a specific course
   async getEnrollmentsByCourse(courseId) {

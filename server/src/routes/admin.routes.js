@@ -12,7 +12,6 @@ router.use(authMiddleware.requireAdmin);
 router.post('/courses', createCourseValidation, adminController.createCourse);
 router.put('/courses/:id', updateCourseValidation, adminController.updateCourse);
 router.delete('/courses/:id', adminController.deleteCourse);
-router.get('/courses', adminController.getAllCourses);
 
 router.get('/enrollments/:courseId', adminController.getEnrollmentsByCourse);
 

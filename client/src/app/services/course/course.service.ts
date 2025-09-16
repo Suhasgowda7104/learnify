@@ -3,6 +3,15 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 
+export interface CourseContent {
+  id: string;
+  title: string;
+  contentType: 'pdf' | 'text';
+  filePath: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -13,6 +22,7 @@ export interface Course {
   createdAt: string;
   updatedAt: string;
   enrollment_count?: number;
+  contents?: CourseContent[];
 }
 
 export interface CourseResponse {
@@ -64,7 +74,7 @@ export class CourseService {
 
   getAdminCourses(): Observable<CourseResponse> {
     const headers = this.getAuthHeaders();
-    return this.http.get<CourseResponse>(`${this.adminApiUrl}/courses`, { headers });
+    return this.http.get<CourseResponse>(`${this.publicApiUrl}/`, { headers });
   }
 
 

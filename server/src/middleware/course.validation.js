@@ -23,7 +23,28 @@ export const createCourseValidation = [
   body('isActive')
     .optional()
     .isBoolean()
-    .withMessage('isActive must be a boolean')
+    .withMessage('isActive must be a boolean'),
+  body('courseContent')
+    .optional()
+    .isArray()
+    .withMessage('Course content must be an array'),
+  body('courseContent.*.title')
+    .if(body('courseContent').exists())
+    .notEmpty()
+    .withMessage('Content title is required')
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Content title must be between 1 and 255 characters'),
+  body('courseContent.*.contentType')
+    .if(body('courseContent').exists())
+    .notEmpty()
+    .withMessage('Content type is required')
+    .isIn(['pdf', 'text'])
+    .withMessage('Content type must be either pdf or text'),
+  body('courseContent.*.filePath')
+    .if(body('courseContent').exists())
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('File path must not exceed 500 characters')
 ];
 
 export const updateCourseValidation = [

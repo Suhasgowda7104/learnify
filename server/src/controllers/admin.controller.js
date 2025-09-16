@@ -18,7 +18,8 @@ class AdminController {
         description: req.body.description,
         price: req.body.price,
         durationHours: req.body.durationHours,
-        isActive: req.body.isActive !== undefined ? req.body.isActive : true
+        isActive: req.body.isActive !== undefined ? req.body.isActive : true,
+        courseContent: req.body.courseContent || []
       };
 
       const course = await adminService.createCourse(courseData);
@@ -98,24 +99,7 @@ class AdminController {
     }
   }
 
-  async getAllCourses(req, res) {
-    try {
-      const courses = await adminService.getAllCoursesWithEnrollmentCounts();
 
-      res.status(200).json({
-        success: true,
-        message: 'Courses retrieved successfully',
-        data: courses,
-        total: courses.length
-      });
-    } catch (error) {
-      console.error('Get all courses error:', error);
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to retrieve courses'
-      });
-    }
-  }
 
   async getEnrollmentsByCourse(req, res) {
     try {

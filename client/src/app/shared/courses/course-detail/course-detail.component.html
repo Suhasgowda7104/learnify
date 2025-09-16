@@ -45,21 +45,20 @@
         </div>
       </div>
 
+      <!-- Course Information Card -->
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">{{ course.title }}</h2>
+          <div class="flex items-start justify-between">
+            <h2 class="card-title">{{ course.title }}</h2>
+            <span class="status-badge" [class]="course.isActive ? 'status-active' : 'status-inactive'">
+              {{ course.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
         </div>
-        <div class="card-content details-content">
+        <div class="card-content">
           <div class="content-section">
             <h3>Description</h3>
             <p class="text-muted-foreground">{{ course.description }}</p>
-          </div>
-          
-          <div class="content-section">
-            <h3>Course Content</h3>
-            <p class="text-muted-foreground">
-              This course provides comprehensive coverage of {{ course.title }} with practical exercises and real-world applications.
-            </p>
           </div>
           
           <div class="details-grid">
@@ -76,58 +75,65 @@
               <p class="text-muted-foreground">{{ course.id }}</p>
             </div>
             <div class="detail-item">
-              <h4>Status</h4>
-              <p class="text-muted-foreground">{{ course.isActive ? 'Active' : 'Inactive' }}</p>
+              <h4>Created</h4>
+              <p class="text-muted-foreground">{{ formatDate(course.createdAt) }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- <div class="card" *ngIf="isAdmin">
+      <!-- Course Content Card -->
+      <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Course Management</h2>
+          <h2 class="card-title">
+            Course Content 
+            <span *ngIf="course.contents">({{ course.contents.length }} items)</span>
+            <span *ngIf="!course.contents || course.contents.length === 0">(0 items)</span>
+          </h2>
         </div>
         <div class="card-content">
-          <div class="management-buttons">
-            <button class="btn btn-outline w-full justify-start">Manage Course Content</button>
-            <button class="btn btn-outline w-full justify-start">View Students</button>
-            <button class="btn btn-outline w-full justify-start">Course Analytics</button>
-            <button class="btn btn-outline w-full justify-start">Settings</button>
+          <div *ngIf="course.contents && course.contents.length > 0; else noContent">
+            <div class="content-list">
+              <div class="content-item" *ngFor="let content of course.contents; let i = index">
+                <div class="content-item-info">
+                  <svg class="content-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" 
+                        *ngIf="content.contentType === 'text'">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                   </svg>
+                   <svg class="content-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" 
+                        *ngIf="content.contentType === 'pdf'">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                           d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707L13.293 3.293A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                   </svg>
+                  <div class="content-details">
+                    <h4>{{ content.title }}</h4>
+                    <p class="text-muted-foreground text-sm" *ngIf="content.filePath">{{ content.filePath }}</p>
+                  </div>
+                </div>
+                <div class="content-item-meta">
+                  <span class="content-type-badge" [class]="'content-type-' + content.contentType">
+                    {{ content.contentType.toUpperCase() }}
+                  </span>
+                  <span class="text-xs text-muted-foreground" *ngIf="content.created_at">
+                     {{ formatDate(content.created_at) }}
+                   </span>
+                </div>
+              </div>
+            </div>
           </div>
+          <ng-template #noContent>
+            <div class="empty-content-state">
+              <svg class="empty-content-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <h3>No Content Available</h3>
+              <p class="text-muted-foreground">This course doesn't have any content yet.</p>
+            </div>
+          </ng-template>
         </div>
       </div>
-
-      <div class="card" *ngIf="isStudent">
-        <div class="card-header">
-          <h2 class="card-title">Enrollment</h2>
-        </div>
-        <div class="card-content">
-          <div class="enrollment-info">
-            <p class="text-muted-foreground mb-4">
-              Ready to start your learning journey with {{ course.title }}?
-            </p>
-            <button class="btn btn-primary w-full" (click)="enrollInCourse()">
-              Enroll Now - {{ formatPrice(course.price) }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" *ngIf="!isAuthenticated">
-        <div class="card-header">
-          <h2 class="card-title">Get Started</h2>
-        </div>
-        <div class="card-content">
-          <div class="login-info">
-            <p class="text-muted-foreground mb-4">
-              Please log in to enroll in this course and start learning.
-            </p>
-            <button class="btn btn-primary w-full" routerLink="/login">
-              Log In to Enroll
-            </button>
-          </div>
-        </div>
-      </div> -->
     </div>
   </main>
 
