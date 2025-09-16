@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 })
 export class StudentDashboardComponent implements OnInit {
   currentUser: any = null;
+  currentView: string = 'all';
 
   constructor(
     private authService: AuthService,
@@ -29,6 +30,10 @@ export class StudentDashboardComponent implements OnInit {
       this.router.navigate(['/admin']);
       return;
     }
+  }
+
+  switchView(view: string): void {
+    this.currentView = view;
   }
 
   logout(): void {

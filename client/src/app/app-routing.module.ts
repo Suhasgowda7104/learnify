@@ -7,7 +7,6 @@ import { StudentDashboardComponent } from './student/student-dashboard/student-d
 import { CourseFormComponent } from './admin/course-form/course-form.component';
 import { CourseDetailComponent } from './shared/courses/course-detail/course-detail.component';
 import { CourseListComponent } from './shared/courses/course-list/course-list.component';
-
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },

@@ -103,6 +103,8 @@ class StudentService {
    * @returns {Array} List of student's enrollments
    */
   async getStudentEnrollments(studentId) {
+    console.log('🔍 Getting enrollments for student ID:', studentId);
+    
     const enrollments = await Enrollment.findAll({
       where: { studentId: studentId },
       include: [{
@@ -113,6 +115,16 @@ class StudentService {
       }],
       attributes: ['id', 'enrollmentDate', 'status', 'completionDate'],
       order: [['enrollmentDate', 'DESC']]
+    });
+
+    console.log('📊 Found enrollments:', enrollments.length);
+    enrollments.forEach((enrollment, index) => {
+      console.log(`📝 Enrollment ${index + 1}:`, {
+        id: enrollment.id,
+        studentId: enrollment.studentId,
+        courseId: enrollment.courseId,
+        courseTitle: enrollment.course?.title
+      });
     });
 
     return enrollments.map(enrollment => ({

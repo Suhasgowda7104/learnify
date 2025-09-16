@@ -13,6 +13,7 @@ export class CourseListComponent implements OnInit {
   @Input() courses: Course[] = [];
   @Input() isAdminView: boolean = false;
   @Input() showActions: boolean = true;
+  @Input() showEnrolledOnly: boolean = false;
   
   currentUser: any = null;
   isLoading = false;
@@ -36,21 +37,37 @@ export class CourseListComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const courseObservable = this.isAdminView 
-      ? this.courseService.getAdminCourses()
-      : this.courseService.getPublicCourses();
+    console.log('🔍 CourseList - Loading courses with params:', {
+      showEnrolledOnly: this.showEnrolledOnly,
+      isAdminView: this.isAdminView,
+      currentUser: this.currentUser
+    });
+
+    let courseObservable;
+    if (this.showEnrolledOnly) {
+      console.log('📚 CourseList - Fetching enrolled courses only');
+      courseObservable = this.courseService.getEnrolledCourses();
+    } else if (this.isAdminView) {
+      console.log('👑 CourseList - Fetching admin courses');
+      courseObservable = this.courseService.getAdminCourses();
+    } else {
+      console.log('🌐 CourseList - Fetching public courses');
+      courseObservable = this.courseService.getPublicCourses();
+    }
 
     courseObservable.subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.isLoading = false;
+        console.log('✅ CourseList - Received response:', response);
         if (response.success) {
           this.courses = Array.isArray(response.data) ? response.data : [];
+          console.log('📊 CourseList - Final courses array:', this.courses);
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         this.isLoading = false;
         this.errorMessage = 'Failed to load courses';
-        console.error('Error loading courses:', error);
+        console.error('❌ CourseList - Error loading courses:', error);
       }
     });
   }

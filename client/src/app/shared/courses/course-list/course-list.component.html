@@ -44,8 +44,10 @@
   </div>
 
   <div *ngIf="!isLoading && !errorMessage && courses.length === 0" class="empty-container">
-    <h3>No courses available</h3>
-    <p class="text-muted-foreground" *ngIf="isAdminView">Create your first course to get started.</p>
-    <p class="text-muted-foreground" *ngIf="!isAdminView">Check back later for new courses.</p>
+    <h3 *ngIf="showEnrolledOnly">No enrolled courses</h3>
+    <h3 *ngIf="!showEnrolledOnly">No courses available</h3>
+    <p class="text-muted-foreground" *ngIf="showEnrolledOnly">You haven't enrolled in any courses yet. Browse available courses to get started.</p>
+    <p class="text-muted-foreground" *ngIf="isAdminView && !showEnrolledOnly">Create your first course to get started.</p>
+    <p class="text-muted-foreground" *ngIf="!isAdminView && !showEnrolledOnly">Check back later for new courses.</p>
   </div>
 </div>

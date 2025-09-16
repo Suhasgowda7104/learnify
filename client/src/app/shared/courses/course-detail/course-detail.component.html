@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-background">
   <app-header 
-    title="Admin Dashboard" 
-    subtitle="Manage your courses"
+    [title]="getHeaderTitle()" 
+    [subtitle]="getHeaderSubtitle()"
     [showUserInfo]="true">
   </app-header>
 

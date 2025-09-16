@@ -2,46 +2,36 @@
   <!-- Header -->
   <app-header 
     title="Student Dashboard" 
-    subtitle="Explore and enroll in courses"
+    subtitle="Explore and manage your courses"
     [showUserInfo]="true">
   </app-header>
 
   <!-- Main Content -->
-  <main class="container mx-auto px-6 py-6">
-    <div class="dashboard-content">
-      <!-- Available Courses Section -->
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Available Courses</h2>
-        </div>
-        <div class="card-content">
-          <app-course-list [isAdminView]="false" [showActions]="true"></app-course-list>
-        </div>
+  <main class="main-content">
+    <div class="tabs">
+      <div class="tabs-list">
+        <button 
+          class="tab-trigger" 
+          [class.active]="currentView === 'all'"
+          (click)="switchView('all')">
+          All Courses
+        </button>
+        <button 
+          class="tab-trigger" 
+          [class.active]="currentView === 'enrolled'"
+          (click)="switchView('enrolled')">
+          My Enrollments
+        </button>
       </div>
-      
-      <!-- My Enrollments Section -->
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">My Enrollments</h2>
-        </div>
-        <div class="card-content">
-          <p class="text-muted-foreground">You haven't enrolled in any courses yet.</p>
-          <button class="btn btn-primary">Browse Courses</button>
-        </div>
+        
+
+      <div class="tab-content" [class.active]="currentView === 'all'">
+        <app-course-list [isAdminView]="false" [showActions]="true"></app-course-list>
       </div>
-      
-      <!-- Quick Actions -->
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Quick Actions</h2>
-        </div>
-        <div class="card-content">
-          <div class="action-buttons">
-            <button class="btn btn-outline w-full justify-start">Browse All Courses</button>
-            <button class="btn btn-outline w-full justify-start">View My Profile</button>
-            <button class="btn btn-outline w-full justify-start">Download Certificates</button>
-          </div>
-        </div>
+        
+
+      <div class="tab-content" [class.active]="currentView === 'enrolled'">
+        <app-course-list [isAdminView]="false" [showActions]="true" [showEnrolledOnly]="true"></app-course-list>
       </div>
     </div>
   </main>

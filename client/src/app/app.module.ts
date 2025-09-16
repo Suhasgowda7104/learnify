@@ -8,7 +8,6 @@ import { SharedModule } from './shared/shared.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { StudentModule } from './student/student.module';
-
 @NgModule({
   declarations: [
     AppComponent

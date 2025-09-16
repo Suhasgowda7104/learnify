@@ -133,4 +133,12 @@ export class CourseDetailComponent implements OnInit {
   get isAuthenticated(): boolean {
     return this.authService.isAuthenticated();
   }
+
+  getHeaderTitle(): string {
+    return this.isAdmin ? 'Admin Dashboard' : 'Student Dashboard';
+  }
+
+  getHeaderSubtitle(): string {
+    return this.isAdmin ? 'Manage your courses' : 'Explore and manage your courses';
+  }
 }
