@@ -98,8 +98,20 @@ export class CourseListComponent implements OnInit {
     if (hours < 24) {
       return `${hours} hour${hours === 1 ? '' : 's'}`;
     }
-    const days = Math.round(hours / 24);
-    return `${days} day${days === 1 ? '' : 's'}`;
+    const weeks = Math.round(hours / (24 * 7));
+    return `${weeks} week${weeks === 1 ? '' : 's'}`;
+  }
+
+  limitDescription(description: string, wordLimit: number = 25): string {
+    if (!description) return '';
+    
+    const words = description.trim().split(/\s+/);
+    
+    if (words.length <= wordLimit) {
+      return description;
+    }
+    
+    return words.slice(0, wordLimit).join(' ') + '...';
   }
 
 

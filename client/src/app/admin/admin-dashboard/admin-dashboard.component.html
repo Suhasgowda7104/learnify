@@ -25,46 +25,7 @@
         
 
       <div class="tab-content" [class.active]="currentView === 'courses'">
-        <div *ngIf="isLoading" class="loading-container">
-          <div class="spinner"></div>
-          <p class="text-muted-foreground">Loading courses...</p>
-        </div>
-  
-
-        <div *ngIf="errorMessage && !isLoading" class="error-container">
-          <p class="text-muted-foreground">{{ errorMessage }}</p>
-          <button class="btn btn-outline" (click)="loadCourses()">Try Again</button>
-        </div>
-  
-
-        <div *ngIf="!isLoading && !errorMessage" class="course-grid">
-          <div class="course-card" *ngFor="let course of courses">
-            <div class="card-header">
-              <h3 class="card-title">{{ course.title }}</h3>
-            </div>
-            <div class="card-content">
-              <p class="text-muted-foreground">{{ limitDescription(course.description, 25) }}</p>
-              <div class="course-meta">
-                <span class="duration" *ngIf="course.durationHours">
-                  {{ formatDuration(course.durationHours) }}
-                </span>
-                <span class="price">${{ course.price }}</span>
-              </div>
-            </div>
-            <div class="card-footer">
-              <button class="btn btn-view-details w-full" (click)="viewCourseDetails(course.id)">
-                View Details
-              </button>
-            </div>
-          </div>
-        </div>
-  
-
-        <div *ngIf="!isLoading && !errorMessage && courses.length === 0" class="empty-container">
-          <h3>No courses available</h3>
-          <p class="text-muted-foreground">Create your first course to get started.</p>
-          <button class="btn btn-primary" (click)="switchView('create')">Create New Course</button>
-        </div>
+        <app-course-list></app-course-list>
       </div>
         
 

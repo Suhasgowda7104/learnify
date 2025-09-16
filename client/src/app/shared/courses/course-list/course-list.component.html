@@ -1,84 +1,51 @@
 <div class="course-list-container">
-  <div class="loading-state" *ngIf="isLoading">
-    <div class="spinner-large"></div>
-    <p>Loading courses...</p>
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p class="text-muted-foreground">Loading courses...</p>
   </div>
 
-  <div class="error-state" *ngIf="errorMessage && !isLoading">
-    <div class="error-icon">⚠️</div>
-    <h3>Unable to load courses</h3>
-    <p>{{ errorMessage }}</p>
-    <button class="retry-btn" (click)="loadCourses()">Try Again</button>
+  <div *ngIf="errorMessage && !isLoading" class="error-container">
+    <p class="text-muted-foreground">{{ errorMessage }}</p>
+    <button class="btn btn-outline" (click)="loadCourses()">Try Again</button>
   </div>
 
-  <div class="empty-state" *ngIf="!isLoading && !errorMessage && courses.length === 0">
-    <div class="empty-icon">📚</div>
-    <h3>No courses available</h3>
-    <p *ngIf="isAdminView">Create your first course to get started.</p>
-    <p *ngIf="!isAdminView">Check back later for new courses.</p>
-  </div>
-
-  <div class="courses-grid" *ngIf="!isLoading && !errorMessage && courses.length > 0">
+  <div *ngIf="!isLoading && !errorMessage" class="course-grid">
     <div class="course-card" *ngFor="let course of courses">
-      <div class="course-image">
-        <div class="image-placeholder">
-          <span class="course-icon">📖</span>
-        </div>
-        <div class="course-status" *ngIf="isAdminView">
-          <span class="status-badge" [class.active]="course.isActive" [class.inactive]="!course.isActive">
-            {{ course.isActive ? 'Active' : 'Inactive' }}
+      <div class="card-header">
+        <h3 class="card-title">{{ course.title }}</h3>
+      </div>
+      <div class="card-content">
+        <p class="text-muted-foreground">{{ limitDescription(course.description, 25) }}</p>
+        <div class="course-meta">
+          <span class="duration" *ngIf="course.durationHours">
+            {{ formatDuration(course.durationHours) }}
           </span>
+          <span class="price">${{ course.price }}</span>
         </div>
       </div>
-
-      <div class="course-content">
-        <h3 class="course-title">{{ course.title }}</h3>
-        <p class="course-description">{{ course.description }}</p>
-        
-        <div class="course-meta">
-          <div class="meta-item">
-            <span class="meta-label">Price:</span>
-            <span class="meta-value price">{{ formatPrice(course.price) }}</span>
-          </div>
-          <div class="meta-item" *ngIf="course.durationHours">
-            <span class="meta-label">Duration:</span>
-            <span class="meta-value">{{ formatDuration(course.durationHours) }}</span>
-          </div>
-          <div class="meta-item" *ngIf="isAdminView && course.enrollment_count !== undefined">
-            <span class="meta-label">Enrolled:</span>
-            <span class="meta-value">{{ course.enrollment_count }} student{{ course.enrollment_count === 1 ? '' : 's' }}</span>
-          </div>
+      <div class="card-footer">
+        <div *ngIf="isAdminView && isAdmin">
+          <button class="btn btn-view-details w-full" (click)="viewCourseDetails(course.id)">
+            View Details
+          </button>
         </div>
-
-        <div class="course-actions" *ngIf="showActions">
-          <div class="admin-actions" *ngIf="isAdminView && isAdmin">
-            <button class="action-btn view" (click)="viewCourseDetails(course.id)">
-              View Details
-            </button>
-            <button class="action-btn edit" (click)="editCourse(course.id)">
-              Edit
-            </button>
-            <button class="action-btn delete" (click)="deleteCourse(course.id)">
-              Delete
-            </button>
-          </div>
-
-          <div class="student-actions" *ngIf="!isAdminView && isStudent">
-            <button class="action-btn view primary" (click)="viewCourseDetails(course.id)">
-              View Details
-            </button>
-            <button class="action-btn enroll" (click)="enrollInCourse(course.id)">
-              Enroll Now
-            </button>
-          </div>
-
-          <div class="public-actions" *ngIf="!isAdminView && !isStudent">
-            <button class="action-btn view primary" (click)="viewCourseDetails(course.id)">
-              View Details
-            </button>
-          </div>
+        <div *ngIf="!isAdminView && isStudent">
+          <button class="btn btn-view-details w-full" (click)="viewCourseDetails(course.id)">
+            View Details
+          </button>
+        </div>
+        <div *ngIf="!isAdminView && !isStudent">
+          <button class="btn btn-view-details w-full" (click)="viewCourseDetails(course.id)">
+            View Details
+          </button>
         </div>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && courses.length === 0" class="empty-container">
+    <h3>No courses available</h3>
+    <p class="text-muted-foreground" *ngIf="isAdminView">Create your first course to get started.</p>
+    <p class="text-muted-foreground" *ngIf="!isAdminView">Check back later for new courses.</p>
   </div>
 </div>

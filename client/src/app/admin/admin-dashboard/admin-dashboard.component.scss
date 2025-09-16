@@ -83,192 +83,31 @@ main {
   display: block;
 }
 
-.course-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
-  justify-items: center;
-  padding: 0;
-}
 
-.course-card {
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 240px;
-  width: 280px;
-  margin: 0 auto;
-}
 
-.course-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
 
-.card-header {
-  padding: var(--space-2) var(--space-3) 0;
-  height: 45px;
-  display: flex;
-  align-items: flex-start;
-}
-
-.card-title {
-  margin-bottom: var(--space-2);
-  font-size: 1rem;
-  font-weight: var(--font-weight-medium);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.card-content {
-  padding: var(--space-2) var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  height: 130px;
-  overflow: hidden;
-}
-
-.card-footer {
-  padding: 0 var(--space-3) var(--space-2);
-  height: 65px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
-.course-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--border);
-}
-
-.duration {
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
-}
-
-.price {
-  font-size: 0.875rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--foreground);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius);
-  border: 1px solid transparent;
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  font-size: 1rem;
-}
-
-.btn:hover {
-  opacity: 0.9;
-}
-
-.btn-outline {
-  background-color: transparent;
-  border-color: var(--border);
-  color: var(--foreground);
-}
-
-.btn-outline:hover {
-  background-color: var(--accent);
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-}
-
-.btn-view-details {
-  background-color: #D3D3D3;
-  color: var(--foreground);
-}
 
 .form-container {
   max-width: 28rem;
   margin: 0 auto;
 }
 
-.loading-container,
-.error-container,
-.empty-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-12) var(--space-4);
-  text-align: center;
-}
 
-.loading-container .spinner {
-  width: 2rem;
-  height: 2rem;
-  border: 2px solid var(--muted-foreground);
-  border-top: 2px solid var(--primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: var(--space-4);
-}
-
-.error-container p,
-.empty-container p {
-  margin-bottom: var(--space-4);
-}
-
-.empty-container h3 {
-  margin-bottom: var(--space-2);
-  color: var(--foreground);
-}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-@media (min-width: 1024px) {
-  .course-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 @media (max-width: 1023px) and (min-width: 768px) {
   .main-content {
     padding: var(--space-6) var(--space-12);
-  }
-  
-  .course-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-4);
   }
 }
 
 @media (max-width: 767px) {
   .main-content {
     padding: var(--space-4) var(--space-6);
-  }
-  
-  .course-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
   }
   
   .tabs-list {
@@ -278,20 +117,5 @@ main {
   .tab-trigger {
     min-width: 120px;
     padding: var(--space-2) var(--space-3);
-  }
-  
-  .card-header,
-  .card-content,
-  .card-footer {
-    padding-left: var(--space-4);
-    padding-right: var(--space-4);
-  }
-  
-  .card-content {
-    padding: var(--space-4);
-  }
-  
-  .card-footer {
-    padding: 0 var(--space-4) var(--space-4);
   }
 }
