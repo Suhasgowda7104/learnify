@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService, Course, CourseContent } from '../../../services/course/course.service';
 import { AuthService } from '../../../services/auth/auth.service';
+import { EnrollmentService } from '../../../services/enrollment/enrollment.service';
 
 @Component({
   selector: 'app-course-detail',
@@ -15,12 +16,15 @@ export class CourseDetailComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
   courseId: string | null = null;
+  isEnrolled = false;
+  isEnrollmentLoading = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private courseService: CourseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private enrollmentService: EnrollmentService
   ) {}
 
   ngOnInit(): void {
@@ -29,6 +33,9 @@ export class CourseDetailComponent implements OnInit {
     
     if (this.courseId) {
       this.loadCourseDetails(this.courseId);
+      if (this.isStudent) {
+        this.checkEnrollmentStatus(this.courseId);
+      }
     } else {
       this.errorMessage = 'Course ID not found';
       this.isLoading = false;
@@ -86,11 +93,39 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
+  checkEnrollmentStatus(courseId: string): void {
+    this.enrollmentService.isEnrolledInCourse(courseId).subscribe({
+      next: (enrolled) => {
+        this.isEnrolled = enrolled;
+      },
+      error: (error) => {
+        console.error('Error checking enrollment status:', error);
+        this.isEnrolled = false;
+      }
+    });
+  }
+
   enrollInCourse(): void {
-    if (this.course?.id) {
-      // TODO: Implement enrollment functionality
-      console.log('Enrolling in course:', this.course.id);
-      alert('Enrollment functionality will be implemented next!');
+    if (this.course?.id && !this.isEnrolled) {
+      this.isEnrollmentLoading = true;
+      
+      this.enrollmentService.enrollInCourse(this.course.id).subscribe({
+        next: (response) => {
+          this.isEnrollmentLoading = false;
+          if (response.success) {
+            this.isEnrolled = true;
+            alert('Successfully enrolled in the course!');
+          } else {
+            alert('Failed to enroll: ' + response.message);
+          }
+        },
+        error: (error) => {
+          this.isEnrollmentLoading = false;
+          console.error('Error enrolling in course:', error);
+          const errorMessage = error.error?.message || 'Failed to enroll in course';
+          alert('Error: ' + errorMessage);
+        }
+      });
     }
   }
 
