@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, HostListener, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 
@@ -14,10 +14,12 @@ export class HeaderComponent implements OnInit {
   @Input() showUserInfo: boolean = true;
   
   currentUser: any = null;
+  isDropdownOpen: boolean = false;
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -25,9 +27,18 @@ export class HeaderComponent implements OnInit {
   }
 
 
-  onProfileClick(): void {
-    if (confirm('Do you want to logout?')) {
-      this.logout();
+  toggleDropdown(): void {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  closeDropdown(): void {
+    this.isDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.closeDropdown();
     }
   }
 

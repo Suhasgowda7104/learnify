@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CourseService, CreateCourseData } from '../../services/course/course.service';
+import { CourseService, CreateCourseData, CourseContentForm } from '../../services/course/course.service';
 
 @Component({
   selector: 'app-course-form',
@@ -43,8 +43,9 @@ export class CourseFormComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
       price: [0, [Validators.required, Validators.min(0)]],
-      durationHours: ['1 week', [Validators.required]],
-      isActive: [true]
+      durationHours: ['', [Validators.required]],
+      isActive: [true],
+      courseContent: this.fb.array([])
     });
   }
 
@@ -61,6 +62,20 @@ export class CourseFormComponent implements OnInit {
             durationHours: this.formatDurationForEdit(course.durationHours),
             isActive: course.isActive
           });
+          
+          // Load course content if available
+          if (course.contents && course.contents.length > 0) {
+            const contentArray = this.courseContent;
+            contentArray.clear();
+            course.contents.forEach(content => {
+              const contentGroup = this.fb.group({
+                title: [content.title, [Validators.required, Validators.minLength(1), Validators.maxLength(255)]],
+                contentType: [content.contentType, [Validators.required]],
+                filePath: [content.filePath, [Validators.required, Validators.maxLength(500)]]
+              });
+              contentArray.push(contentGroup);
+            });
+          }
         }
       },
       error: (error) => {
@@ -81,7 +96,8 @@ export class CourseFormComponent implements OnInit {
         description: this.courseForm.value.description,
         price: parseFloat(this.courseForm.value.price),
         durationHours: this.parseDurationToHours(this.courseForm.value.durationHours),
-        isActive: this.courseForm.value.isActive
+        isActive: this.courseForm.value.isActive,
+        courseContent: this.courseForm.value.courseContent || []
       };
 
       const operation = this.isEditMode && this.courseId
@@ -98,7 +114,7 @@ export class CourseFormComponent implements OnInit {
             
             if (!this.isEditMode) {
               this.courseForm.reset();
-              this.courseForm.patchValue({ price: 0, durationHours: '1 week', isActive: true });
+              this.courseForm.patchValue({ price: 0, durationHours: '', isActive: true });
             }
             
             this.courseCreated.emit();
@@ -155,6 +171,26 @@ export class CourseFormComponent implements OnInit {
     return this.courseForm.get('isActive');
   }
 
+  get courseContent(): FormArray {
+    return this.courseForm.get('courseContent') as FormArray;
+  }
+
+  createCourseContentFormGroup(): FormGroup {
+    return this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(255)]],
+      contentType: ['text', [Validators.required]],
+      filePath: ['', [Validators.required, Validators.maxLength(500)]]
+    });
+  }
+
+  addCourseContent(): void {
+    this.courseContent.push(this.createCourseContentFormGroup());
+  }
+
+  removeCourseContent(index: number): void {
+    this.courseContent.removeAt(index);
+  }
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.courseForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
@@ -206,6 +242,12 @@ export class CourseFormComponent implements OnInit {
 
     const str = durationStr.toString().toLowerCase().trim();
     
+    // Check if it's just a number (no units specified)
+    const numberOnlyMatch = str.match(/^\d+$/);
+    if (numberOnlyMatch) {
+      return parseInt(numberOnlyMatch[0]);
+    }
+    
     const match = str.match(/\d+/);
     if (!match) return 1;
     
@@ -216,7 +258,8 @@ export class CourseFormComponent implements OnInit {
     } else if (str.includes('hour')) {
       return number;
     } else {
-      return number * 24 * 7;
+      // If no unit is specified but it's not just a number, default to hours
+      return number;
     }
   }
 }

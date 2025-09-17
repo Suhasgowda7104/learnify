@@ -50,7 +50,14 @@ class AdminController {
       }
 
       const courseId = req.params.id;
-      const updateData = req.body;
+      const updateData = {
+        title: req.body.title,
+        description: req.body.description,
+        price: req.body.price,
+        durationHours: req.body.durationHours,
+        isActive: req.body.isActive !== undefined ? req.body.isActive : true,
+        courseContent: req.body.courseContent || []
+      };
 
       const course = await adminService.updateCourse(courseId, updateData);
 

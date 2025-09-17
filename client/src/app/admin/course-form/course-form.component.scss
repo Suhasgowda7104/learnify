@@ -44,70 +44,73 @@ main {
 }
 
 .form-card {
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  max-width: 48rem;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
 .card-header {
-  padding: var(--space-6) var(--space-6) 0;
-  border-bottom: 1px solid var(--border);
+  padding: 24px 32px 0;
+  border-bottom: none;
   margin-bottom: 0;
 }
 
 .card-title {
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--foreground);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
   margin: 0;
-  padding-bottom: var(--space-6);
+  padding-bottom: 24px;
 }
 
 .card-content {
-  padding: var(--space-6);
+  padding: 0 32px 32px;
 }
 
 .course-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 24px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
+  gap: 20px;
 }
 
 label {
-  font-size: 1rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--foreground);
-  margin-bottom: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0;
 }
 
 input[type="text"],
 input[type="number"],
 textarea,
 select {
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background-color: var(--input-background);
-  color: var(--foreground);
-  font-size: 1rem;
-  font-weight: var(--font-weight-normal);
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  color: #1f2937;
+  font-size: 0.875rem;
+  font-weight: 400;
   line-height: 1.5;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 input[type="text"]:focus,
@@ -115,7 +118,8 @@ input[type="number"]:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: var(--ring);
+  border-color: #3b82f6;
+  background-color: white;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -125,11 +129,13 @@ textarea:disabled,
 select:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  background-color: #f3f4f6;
 }
 
 textarea {
-  min-height: 80px;
+  min-height: 100px;
   resize: vertical;
+  font-family: inherit;
 }
 
 .checkbox-wrapper {
@@ -181,26 +187,27 @@ input[type="checkbox"] {
 
 .form-actions {
   display: flex;
-  gap: var(--space-4);
+  gap: 16px;
   justify-content: flex-end;
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border);
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius);
+  padding: 12px 24px;
+  border-radius: 8px;
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  font-size: 1rem;
-  gap: var(--space-2);
+  font-weight: 500;
+  font-size: 0.875rem;
+  gap: 8px;
+  min-height: 44px;
 }
 
 .btn:disabled {
@@ -209,12 +216,17 @@ input[type="checkbox"] {
 }
 
 .btn-primary {
-  background-color: #D3D3D3;
-  color:black;
+  background-color: #1f2937;
+  color: white;
+  border: none;
+  font-weight: 600;
+  min-width: 140px;
 }
 
 .btn-primary:hover:not(:disabled) {
-  opacity: 0.9;
+  background-color: #111827;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-outline {
@@ -257,12 +269,33 @@ input[type="checkbox"] {
 .embedded-form {
   background-color: var(--card);
   border-radius: var(--radius);
-  max-width: 28rem;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .embedded-form .card-content {
   padding: var(--space-6);
+}
+
+// Custom scrollbar for embedded form
+.embedded-form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.embedded-form::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+.embedded-form::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.embedded-form::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
 }
 
 @media (max-width: 1023px) and (min-width: 768px) {
@@ -305,9 +338,215 @@ input[type="checkbox"] {
   .embedded-form {
     margin: 0;
     border-radius: 0;
+    max-height: 85vh;
   }
 
   .embedded-form .card-content {
     padding: var(--space-4);
+  }
+}
+
+// Course Content Section Styles - Modern design
+.course-content-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: white;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.add-content-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #374151;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
+  }
+}
+
+.content-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.content-item {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.content-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.content-item-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  &::before {
+    content: "📄";
+    font-size: 1rem;
+  }
+}
+
+.remove-btn {
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  min-width: auto;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+  }
+}
+
+.content-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.form-select {
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  color: #1f2937;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.no-content-message {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--muted-foreground);
+  font-style: italic;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    margin: 0;
+  }
+}
+
+// Custom scrollbar for content items
+.content-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-items::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 3px;
+}
+
+.content-items::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.content-items::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+@media (max-width: 767px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-3) var(--space-2);
+  }
+
+  .content-form-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .content-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .course-content-section {
+    height: 250px;
+  }
+
+  .content-items {
+    padding: var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .content-item {
+    padding: var(--space-2);
+  }
+
+  .add-content-btn {
+    padding: var(--space-1) var(--space-2);
+    font-size: 0.75rem;
   }
 }

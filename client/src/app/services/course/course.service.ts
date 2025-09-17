@@ -20,8 +20,8 @@ export interface Course {
   price: number;
   durationHours: number;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   enrollment_count?: number;
   contents?: CourseContent[];
 }
@@ -33,12 +33,19 @@ export interface CourseResponse {
   total?: number;
 }
 
+export interface CourseContentForm {
+  title: string;
+  contentType: 'pdf' | 'text';
+  filePath: string;
+}
+
 export interface CreateCourseData {
   title: string;
   description: string;
   price: number;
   durationHours: number;
   isActive?: boolean;
+  courseContent?: CourseContentForm[];
 }
 
 export interface CourseStats {

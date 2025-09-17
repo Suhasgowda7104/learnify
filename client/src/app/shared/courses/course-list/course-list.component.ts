@@ -37,37 +37,27 @@ export class CourseListComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    console.log('🔍 CourseList - Loading courses with params:', {
-      showEnrolledOnly: this.showEnrolledOnly,
-      isAdminView: this.isAdminView,
-      currentUser: this.currentUser
-    });
-
     let courseObservable;
+    
     if (this.showEnrolledOnly) {
-      console.log('📚 CourseList - Fetching enrolled courses only');
       courseObservable = this.courseService.getEnrolledCourses();
-    } else if (this.isAdminView) {
-      console.log('👑 CourseList - Fetching admin courses');
-      courseObservable = this.courseService.getAdminCourses();
     } else {
-      console.log('🌐 CourseList - Fetching public courses');
-      courseObservable = this.courseService.getPublicCourses();
+      courseObservable = this.isAdminView 
+        ? this.courseService.getAdminCourses()
+        : this.courseService.getPublicCourses();
     }
 
     courseObservable.subscribe({
-      next: (response: any) => {
+      next: (response) => {
         this.isLoading = false;
-        console.log('✅ CourseList - Received response:', response);
         if (response.success) {
           this.courses = Array.isArray(response.data) ? response.data : [];
-          console.log('📊 CourseList - Final courses array:', this.courses);
         }
       },
-      error: (error: any) => {
+      error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Failed to load courses';
-        console.error('❌ CourseList - Error loading courses:', error);
+        console.error('Error loading courses:', error);
       }
     });
   }

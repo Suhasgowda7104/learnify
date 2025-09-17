@@ -16,9 +16,9 @@ class AdminService {
         category: courseData.category,
         level: courseData.level,
         price: courseData.price,
-        duration: courseData.durationHours,
+        durationHours: courseData.durationHours,
         thumbnail: courseData.thumbnail,
-        is_active: courseData.isActive !== undefined ? courseData.isActive : true
+        isActive: courseData.isActive !== undefined ? courseData.isActive : true
       }, { transaction });
 
       // Create course content if provided
@@ -52,15 +52,52 @@ class AdminService {
 
   // Update an existing course
   async updateCourse(courseId, updateData) {
+    const transaction = await sequelize.transaction();
+    
     try {
       const course = await Course.findByPk(courseId);
       if (!course) {
         throw new Error('Course not found');
       }
 
-      await course.update(updateData);
-      return course;
+      // Update course basic fields
+      const { courseContent, ...courseFields } = updateData;
+      await course.update(courseFields, { transaction });
+
+      // Handle course content updates if provided
+      if (courseContent !== undefined) {
+        // Delete existing course content
+        await CourseContent.destroy({
+          where: { courseId: courseId },
+          transaction
+        });
+
+        // Create new course content if provided
+        if (courseContent && courseContent.length > 0) {
+          const courseContentData = courseContent.map(content => ({
+            courseId: courseId,
+            title: content.title,
+            contentType: content.contentType,
+            filePath: content.filePath || null
+          }));
+
+          await CourseContent.bulkCreate(courseContentData, { transaction });
+        }
+      }
+
+      await transaction.commit();
+      
+      // Return updated course with content
+      const updatedCourse = await Course.findByPk(courseId, {
+        include: [{
+          model: CourseContent,
+          as: 'contents'
+        }]
+      });
+      
+      return updatedCourse;
     } catch (error) {
+      await transaction.rollback();
       throw new Error(`Failed to update course: ${error.message}`);
     }
   }

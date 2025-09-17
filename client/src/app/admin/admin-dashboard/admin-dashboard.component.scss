@@ -83,16 +83,10 @@ main {
   display: block;
 }
 
-
-
-
-
 .form-container {
-  max-width: 28rem;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 }
-
-
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
