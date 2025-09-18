@@ -12,7 +12,15 @@
   <div *ngIf="!isLoading && !errorMessage" class="course-grid">
     <div class="course-card" *ngFor="let course of courses">
       <div class="card-header">
-        <h3 class="card-title">{{ course.title }}</h3>
+        <div class="title-container">
+          <h3 class="card-title">{{ course.title }}</h3>
+          <div class="enrollment-indicator" *ngIf="isStudent && isEnrolledInCourse(course.id)">
+            <svg class="checkmark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <!-- <span class="enrolled-text">Enrolled</span> -->
+          </div>
+        </div>
       </div>
       <div class="card-content">
         <p class="text-muted-foreground">{{ limitDescription(course.description, 25) }}</p>

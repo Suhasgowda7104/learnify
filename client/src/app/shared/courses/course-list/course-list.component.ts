@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { CourseService, Course } from '../../../services/course/course.service';
 import { AuthService } from '../../../services/auth/auth.service';
+import { EnrollmentService } from '../../../services/enrollment/enrollment.service';
 
 @Component({
   selector: 'app-course-list',
@@ -18,9 +19,11 @@ export class CourseListComponent implements OnInit {
   currentUser: any = null;
   isLoading = false;
   errorMessage = '';
+  enrolledCourseIds: Set<string> = new Set();
   constructor(
     private courseService: CourseService,
     private authService: AuthService,
+    private enrollmentService: EnrollmentService,
     private router: Router
   ) {}
 
@@ -29,6 +32,11 @@ export class CourseListComponent implements OnInit {
     
     if (this.courses.length === 0) {
       this.loadCourses();
+    }
+    
+    // Load enrollment status for students
+    if (this.isStudent && !this.showEnrolledOnly) {
+      this.loadEnrollmentStatus();
     }
   }
 
@@ -130,5 +138,24 @@ export class CourseListComponent implements OnInit {
 
   get isStudent(): boolean {
     return this.currentUser?.role === 'student';
+  }
+
+  loadEnrollmentStatus(): void {
+    this.enrollmentService.getEnrollments().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.enrolledCourseIds = new Set(
+            response.data.map((enrollment: any) => enrollment.course.id)
+          );
+        }
+      },
+      error: (error) => {
+        console.error('Error loading enrollment status:', error);
+      }
+    });
+  }
+
+  isEnrolledInCourse(courseId: string): boolean {
+    return this.enrolledCourseIds.has(courseId);
   }
 }
