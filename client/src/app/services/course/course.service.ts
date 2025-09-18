@@ -97,11 +97,6 @@ export class CourseService {
     return this.http.delete<CourseResponse>(`${this.adminApiUrl}/courses/${courseId}`, { headers });
   }
 
-  getCourseStats(): Observable<{success: boolean; data: CourseStats}> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<{success: boolean; data: CourseStats}>(`${this.adminApiUrl}/dashboard/stats`, { headers });
-  }
-
   getPublicCourses(): Observable<CourseResponse> {
     return this.http.get<CourseResponse>(`${this.publicApiUrl}`);
   }
@@ -131,5 +126,10 @@ export class CourseService {
 
   getCourseById(courseId: string): Observable<CourseResponse> {
     return this.http.get<CourseResponse>(`${this.publicApiUrl}/${courseId}`);
+  }
+
+  getCourseEnrollmentCount(courseId: string): Observable<{success: boolean; data: {courseId: string; enrollmentCount: number}}> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<{success: boolean; data: {courseId: string; enrollmentCount: number}}>(`${this.adminApiUrl}/courses/${courseId}/enrollment-count`, { headers });
   }
 }

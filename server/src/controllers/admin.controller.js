@@ -133,6 +133,34 @@ class AdminController {
     }
   }
 
+  async getCourseEnrollmentCount(req, res) {
+    try {
+      const courseId = req.params.courseId;
+      const enrollmentCount = await adminService.getCourseEnrollmentCount(courseId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Enrollment count retrieved successfully',
+        data: {
+          courseId: courseId,
+          enrollmentCount: enrollmentCount
+        }
+      });
+    } catch (error) {
+      console.error('Get enrollment count error:', error);
+      if (error.message === 'Course not found') {
+        return res.status(404).json({
+          success: false,
+          message: 'Course not found'
+        });
+      }
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to retrieve enrollment count'
+      });
+    }
+  }
+
   async getCourseStats(req, res) {
     try {
       const stats = await adminService.getCourseStats();

@@ -187,6 +187,24 @@ class AdminService {
     }
   }
 
+  // Get enrollment count for a specific course
+  async getCourseEnrollmentCount(courseId) {
+    try {
+      const course = await Course.findByPk(courseId);
+      if (!course) {
+        throw new Error('Course not found');
+      }
+
+      const enrollmentCount = await Enrollment.count({
+        where: { course_id: courseId }
+      });
+
+      return enrollmentCount;
+    } catch (error) {
+      throw new Error(`Failed to fetch enrollment count: ${error.message}`);
+    }
+  }
+
   // Get course statistics
   async getCourseStats() {
     try {

@@ -18,6 +18,7 @@ export class CourseDetailComponent implements OnInit {
   courseId: string | null = null;
   isEnrolled = false;
   isEnrollmentLoading = false;
+  enrollmentCount = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -35,6 +36,9 @@ export class CourseDetailComponent implements OnInit {
       this.loadCourseDetails(this.courseId);
       if (this.isStudent) {
         this.checkEnrollmentStatus(this.courseId);
+      }
+      if (this.isAdmin) {
+        this.loadEnrollmentCount(this.courseId);
       }
     } else {
       this.errorMessage = 'Course ID not found';
@@ -101,6 +105,20 @@ export class CourseDetailComponent implements OnInit {
       error: (error) => {
         console.error('Error checking enrollment status:', error);
         this.isEnrolled = false;
+      }
+    });
+  }
+
+  loadEnrollmentCount(courseId: string): void {
+    this.courseService.getCourseEnrollmentCount(courseId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.enrollmentCount = response.data.enrollmentCount;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading enrollment count:', error);
+        this.enrollmentCount = 0;
       }
     });
   }

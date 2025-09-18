@@ -72,6 +72,8 @@
   align-items: center;
   padding-top: var(--space-2);
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: var(--space-1);
 }
 
 .duration {
@@ -83,6 +85,15 @@
   font-size: 0.875rem;
   font-weight: var(--font-weight-medium);
   color: var(--foreground);
+}
+
+.enrollment-count {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  background-color: var(--secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: var(--font-weight-medium);
 }
 
 .btn {

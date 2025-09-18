@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
-import { CourseService, CourseStats } from '../../services/course/course.service';
+import { CourseService } from '../../services/course/course.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -11,12 +11,7 @@ import { Router } from '@angular/router';
 })
 export class AdminDashboardComponent implements OnInit {
   currentUser: any = null;
-  stats: CourseStats = {
-    total_courses: 0,
-    active_courses: 0,
-    total_enrollments: 0,
-    total_students: 0
-  };
+
   currentView: 'dashboard' | 'courses' | 'create' = 'courses';
 
   constructor(
@@ -38,21 +33,6 @@ export class AdminDashboardComponent implements OnInit {
       this.router.navigate(['/student']);
       return;
     }
-
-    this.loadStats();
-  }
-
-  loadStats(): void {
-    this.courseService.getCourseStats().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.stats = response.data;
-        }
-      },
-      error: (error) => {
-        console.error('Error loading stats:', error);
-      }
-    });
   }
 
   switchView(view: 'dashboard' | 'courses' | 'create'): void {
@@ -61,7 +41,6 @@ export class AdminDashboardComponent implements OnInit {
 
   onCourseCreated(): void {
     this.currentView = 'courses';
-    this.loadStats();
   }
 
   logout(): void {

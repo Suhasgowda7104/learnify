@@ -14,6 +14,7 @@ router.put('/courses/:id', updateCourseValidation, adminController.updateCourse)
 router.delete('/courses/:id', adminController.deleteCourse);
 
 router.get('/enrollments/:courseId', adminController.getEnrollmentsByCourse);
+router.get('/courses/:courseId/enrollment-count', adminController.getCourseEnrollmentCount);
 
 router.get('/dashboard/stats', adminController.getCourseStats);
 

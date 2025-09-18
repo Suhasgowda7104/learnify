@@ -18,7 +18,6 @@ export class CourseListComponent implements OnInit {
   currentUser: any = null;
   isLoading = false;
   errorMessage = '';
-
   constructor(
     private courseService: CourseService,
     private authService: AuthService,
@@ -32,6 +31,8 @@ export class CourseListComponent implements OnInit {
       this.loadCourses();
     }
   }
+
+
 
   loadCourses(): void {
     this.isLoading = true;
