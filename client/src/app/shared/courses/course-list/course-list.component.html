@@ -29,6 +29,9 @@
             {{ formatDuration(course.durationHours) }}
           </span>
           <span class="price">${{ course.price }}</span>
+          <span class="enrollment-count" *ngIf="isAdmin && (course.enrollmentCount || course.enrollmentCount === 0)">
+            {{ course.enrollmentCount }} {{ course.enrollmentCount === 1 ? 'student' : 'Enrolled' }}
+          </span>
         </div>
       </div>
       <div class="card-footer">

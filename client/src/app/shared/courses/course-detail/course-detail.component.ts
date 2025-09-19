@@ -187,11 +187,26 @@ export class CourseDetailComponent implements OnInit {
     return this.authService.isAuthenticated();
   }
 
-  getHeaderTitle(): string {
+  getHeaderSubtitle(): string {
     return this.isAdmin ? 'Admin Dashboard' : 'Student Dashboard';
   }
 
-  getHeaderSubtitle(): string {
-    return this.isAdmin ? 'Manage your courses' : 'Explore and manage your courses';
+  openContent(content: CourseContent): void {
+    if (!content.filePath) {
+      console.warn('No file path available for this content');
+      return;
+    }
+    if (content.filePath.startsWith('http://') || content.filePath.startsWith('https://')) {
+      window.open(content.filePath, '_blank', 'noopener,noreferrer');
+    } else {
+      const baseUrl = 'http://localhost:5000';
+      const fullUrl = content.filePath.startsWith('/') 
+        ? `${baseUrl}${content.filePath}` 
+        : `${baseUrl}/${content.filePath}`;
+      window.open(fullUrl, '_blank', 'noopener,noreferrer');
+    }
+  }
+  getHeaderTitle(): string {
+    return this.isAdmin ? 'Admin Dashboard' : 'Student Dashboard';
   }
 }

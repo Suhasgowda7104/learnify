@@ -22,7 +22,7 @@ export interface Course {
   isActive: boolean;
   created_at: string;
   updated_at: string;
-  enrollment_count?: number;
+  enrollmentCount?: number;
   contents?: CourseContent[];
 }
 

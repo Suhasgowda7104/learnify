@@ -1,6 +1,6 @@
 import db from '../models/index.js';
 
-const { Course, User, Role, CourseContent } = db;
+const { Course, User, Role, CourseContent, Enrollment } = db;
 
 class CourseService {
   async createCourse(courseData) {
@@ -24,6 +24,23 @@ class CourseService {
   async getAllActiveCourses() {
     return await Course.findAll({
       where: { isActive: true },
+      include: [{
+        model: Enrollment,
+        as: 'enrollments',
+        attributes: []
+      }],
+      attributes: [
+        'id',
+        'title', 
+        'description',
+        'price',
+        'durationHours',
+        'isActive',
+        'created_at',
+        'updated_at',
+        [db.sequelize.fn('COUNT', db.sequelize.col('enrollments.id')), 'enrollmentCount']
+      ],
+      group: ['Course.id'],
       order: [['created_at', 'DESC']]
     });
   }
