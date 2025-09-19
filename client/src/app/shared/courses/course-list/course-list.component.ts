@@ -49,7 +49,7 @@ export class CourseListComponent implements OnInit {
     let courseObservable;
     
     if (this.showEnrolledOnly) {
-      courseObservable = this.courseService.getEnrolledCourses();
+      courseObservable = this.enrollmentService.getEnrolledCourses();
     } else {
       courseObservable = this.isAdminView 
         ? this.courseService.getAdminCourses()

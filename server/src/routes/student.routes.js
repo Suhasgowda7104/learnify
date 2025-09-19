@@ -1,11 +1,14 @@
 import express from 'express';
-import { getAllCourses, getCourseById, enrollInCourse, getStudentEnrollments } from '../controllers/student.controller.js';
+import authMiddleware from '../middleware/auth.middleware.js'
+import { getAllCourses, getCourseById } from '../controllers/student.controller.js';
 import { authenticateToken, requireStudent } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
-router.post('/courses/:id/enroll', authenticateToken, requireStudent, enrollInCourse);
+
+router.use(authMiddleware.authenticateToken);
+router.use(authMiddleware.requireStudent);
+
 router.get('/courses', getAllCourses); 
 router.get('/courses/:id', getCourseById);
-router.get('/enrollments', authenticateToken, requireStudent, getStudentEnrollments);
 
 export default router;

@@ -101,28 +101,7 @@ export class CourseService {
     return this.http.get<CourseResponse>(`${this.publicApiUrl}`);
   }
 
-  getEnrolledCourses(): Observable<CourseResponse> {
-    const headers = this.getAuthHeaders();
-    console.log('🔍 CourseService - Getting enrolled courses with headers:', headers);
-    
-    return this.http.get<any>('http://localhost:5000/api/v1/student/enrollments', { headers })
-      .pipe(
-        map((response: any) => {
-          console.log('📊 CourseService - Enrolled courses response:', response);
-          if (response.success && response.data) {
-            // Transform enrollment data to course format
-            const courses = response.data.map((enrollment: any) => enrollment.course);
-            console.log('📚 CourseService - Transformed courses:', courses);
-            return {
-              success: true,
-              data: courses,
-              message: response.message
-            };
-          }
-          return response;
-        })
-      );
-  }
+  
 
   getCourseById(courseId: string): Observable<CourseResponse> {
     return this.http.get<CourseResponse>(`${this.publicApiUrl}/${courseId}`);

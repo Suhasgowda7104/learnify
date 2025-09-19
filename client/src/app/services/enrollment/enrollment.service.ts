@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
+import { map } from 'rxjs/operators';
 
 export interface EnrollmentResponse {
   success: boolean;
@@ -13,7 +14,7 @@ export interface EnrollmentResponse {
   providedIn: 'root'
 })
 export class EnrollmentService {
-  private apiUrl = 'http://localhost:5000/api/v1/student';
+  private apiUrl = 'http://localhost:5000/api/v1/enrollments';
 
   constructor(
     private http: HttpClient,
@@ -28,11 +29,6 @@ export class EnrollmentService {
     });
   }
 
-  /**
-   * Enroll in a course
-   * @param courseId - Course ID to enroll in
-   * @returns Observable with enrollment response
-   */
   enrollInCourse(courseId: string): Observable<EnrollmentResponse> {
     const headers = this.getAuthHeaders();
     return this.http.post<EnrollmentResponse>(
@@ -42,10 +38,29 @@ export class EnrollmentService {
     );
   }
 
-  /**
-   * Get all enrollments for the current student
-   * @returns Observable with enrollments
-   */
+  getEnrolledCourses(): Observable<EnrollmentResponse> {
+    const headers = this.getAuthHeaders();
+    console.log('CourseService - Getting enrolled courses with headers:', headers);
+    
+    return this.http.get<any>('http://localhost:5000/api/v1/enrollments/enrollments', { headers })
+      .pipe(
+        map((response: any) => {
+          console.log('CourseService - Enrolled courses response:', response);
+          if (response.success && response.data) {
+            // Transform enrollment data to course format
+            const courses = response.data.map((enrollment: any) => enrollment.course);
+            console.log('CourseService - Transformed courses:', courses);
+            return {
+              success: true,
+              data: courses,
+              message: response.message
+            };
+          }
+          return response;
+        })
+      );
+  }
+
   getEnrollments(): Observable<EnrollmentResponse> {
     const headers = this.getAuthHeaders();
     return this.http.get<EnrollmentResponse>(
@@ -54,11 +69,7 @@ export class EnrollmentService {
     );
   }
 
-  /**
-   * Check if student is enrolled in a specific course
-   * @param courseId - Course ID to check
-   * @returns Observable with boolean result
-   */
+
   isEnrolledInCourse(courseId: string): Observable<boolean> {
     return new Observable<boolean>(observer => {
       this.getEnrollments().subscribe({
