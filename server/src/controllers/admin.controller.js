@@ -178,6 +178,40 @@ class AdminController {
       });
     }
   }
+  async getCourseEnrolledUsers(req, res) {
+    try {
+      const { courseId } = req.params;
+
+      if (!courseId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Course ID is required'
+        });
+      }
+
+      const enrolledUsers = await adminService.getCourseEnrolledUsers(courseId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Enrolled users retrieved successfully',
+        data: enrolledUsers,
+        total: enrolledUsers.length
+      });
+    } catch (error) {
+      console.error('Get enrolled users error:', error);
+      if (error.message === 'Course not found') {
+        return res.status(404).json({
+          success: false,
+          message: 'Course not found'
+        });
+      }
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to retrieve enrolled users'
+      });
+    }
+  }
+
 }
 
 export default new AdminController();

@@ -17,5 +17,6 @@ router.get('/enrollments/:courseId', adminController.getEnrollmentsByCourse);
 router.get('/courses/:courseId/enrollment-count', adminController.getCourseEnrollmentCount);
 
 router.get('/dashboard/stats', adminController.getCourseStats);
+router.get('/courses/:courseId/users', adminController.getCourseEnrolledUsers);
 
 export default router;

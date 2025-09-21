@@ -61,11 +61,6 @@ class EnrollmentService {
     };
   }
 
-  /**
-   * Get all enrollments for a student
-   * @param {string} studentId - Student user ID
-   * @returns {Array} List of student's enrollments
-   */
   async getStudentEnrollments(studentId) {
     console.log('🔍 Getting enrollments for student ID:', studentId);
     
@@ -103,38 +98,6 @@ class EnrollmentService {
         price: enrollment.course.price,
         durationHours: enrollment.course.durationHours
       }
-    }));
-  }
-
-  async getCourseEnrolledUsers(courseId) {
-    console.log('🔍 Getting enrolled users for course ID:', courseId);
-    
-    const enrollments = await Enrollment.findAll({
-      where: { 
-        courseId: courseId,
-        status: 'enrolled'
-      },
-      include: [{
-        model: User,
-        as: 'student',
-        attributes: ['id', 'firstName', 'lastName', 'email'],
-        include: [{
-          model: db.Role,
-          as: 'role',
-          attributes: ['name']
-        }]
-      }],
-      attributes: ['id', 'enrollmentDate', 'status'],
-      order: [['enrollmentDate', 'DESC']]
-    });
-
-    console.log('📊 Found enrolled users:', enrollments.length);
-    
-    return enrollments.map(enrollment => ({
-      userId: enrollment.student.id,
-      userName: `${enrollment.student.firstName} ${enrollment.student.lastName}`,
-      email: enrollment.student.email,
-      enrollmentDate: enrollment.enrollmentDate
     }));
   }
 }

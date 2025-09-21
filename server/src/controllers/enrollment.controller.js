@@ -55,35 +55,6 @@ export const enrollInCourse = async (req, res) => {
   }
 };
 
-export const getCourseEnrolledUsers = async (req, res) => {
-  try {
-    const { courseId } = req.params;
-
-    if (!courseId) {
-      return res.status(400).json({
-        message: 'Course ID is required',
-        success: false
-      });
-    }
-
-    const enrolledUsers = await EnrollmentService.getCourseEnrolledUsers(courseId);
-
-    res.status(200).json({
-      message: 'Enrolled users retrieved successfully',
-      success: true,
-      data: enrolledUsers,
-      total: enrolledUsers.length
-    });
-  } catch (error) {
-    console.error('Error fetching enrolled users:', error);
-    res.status(500).json({
-      message: 'Internal server error',
-      success: false,
-      error: error.message
-    });
-  }
-};
-
 export const getStudentEnrollments = async (req, res) => {
   try {
     const studentId = req.user?.id; // From auth middleware

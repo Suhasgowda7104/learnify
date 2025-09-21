@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CourseService, Course, CourseContent } from '../../../services/course/course.service';
+import { CourseService, Course, CourseContent, EnrolledUser } from '../../../services/course/course.service';
 import { AuthService } from '../../../services/auth/auth.service';
 import { EnrollmentService } from '../../../services/enrollment/enrollment.service';
 
@@ -19,6 +19,12 @@ export class CourseDetailComponent implements OnInit {
   isEnrolled = false;
   isEnrollmentLoading = false;
   enrollmentCount = 0;
+  
+  // Enrolled users modal properties
+  showEnrolledUsersModal = false;
+  enrolledUsers: EnrolledUser[] = [];
+  isLoadingEnrolledUsers = false;
+  enrolledUsersError = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -147,12 +153,12 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  formatPrice(price: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(price);
-  }
+formatPrice(price: number): string {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR'
+  }).format(price);
+}
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -208,5 +214,52 @@ export class CourseDetailComponent implements OnInit {
   }
   getHeaderTitle(): string {
     return this.isAdmin ? 'Admin Dashboard' : 'Student Dashboard';
+  }
+
+  // Enrolled users modal methods
+  showEnrolledUsers(): void {
+    if (!this.courseId) return;
+    
+    this.showEnrolledUsersModal = true;
+    this.loadEnrolledUsers();
+  }
+
+  closeEnrolledUsersModal(): void {
+    this.showEnrolledUsersModal = false;
+    this.enrolledUsers = [];
+    this.enrolledUsersError = '';
+  }
+
+  loadEnrolledUsers(): void {
+    if (!this.courseId) return;
+    
+    this.isLoadingEnrolledUsers = true;
+    this.enrolledUsersError = '';
+    
+    this.courseService.getCourseEnrolledUsers(this.courseId).subscribe({
+      next: (response) => {
+        this.isLoadingEnrolledUsers = false;
+        if (response.success) {
+          this.enrolledUsers = response.data;
+        } else {
+          this.enrolledUsersError = response.message || 'Failed to load enrolled users';
+        }
+      },
+      error: (error) => {
+        this.isLoadingEnrolledUsers = false;
+        this.enrolledUsersError = error.error?.message || 'Failed to load enrolled users';
+        console.error('Error loading enrolled users:', error);
+      }
+    });
+  }
+
+  getUserInitials(userName: string): string {
+    if (!userName || userName.trim() === '') return 'U';
+    
+    const names = userName.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    }
+    return userName.charAt(0).toUpperCase();
   }
 }

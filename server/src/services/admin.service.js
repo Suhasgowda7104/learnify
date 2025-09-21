@@ -230,6 +230,38 @@ class AdminService {
       throw new Error(`Failed to fetch course statistics: ${error.message}`);
     }
   }
+
+  async getCourseEnrolledUsers(courseId) {
+    console.log('Getting enrolled users for course ID:', courseId);
+    
+    const enrollments = await Enrollment.findAll({
+      where: { 
+        courseId: courseId,
+        status: 'enrolled'
+      },
+      include: [{
+        model: User,
+        as: 'student',
+        attributes: ['id', 'firstName', 'lastName', 'email'],
+        include: [{
+          model: db.Role,
+          as: 'role',
+          attributes: ['name']
+        }]
+      }],
+      attributes: ['id', 'enrollmentDate', 'status'],
+      order: [['enrollmentDate', 'DESC']]
+    });
+
+    console.log('Found enrolled users:', enrollments.length);
+    
+    return enrollments.map(enrollment => ({
+      userId: enrollment.student.id,
+      userName: `${enrollment.student.firstName} ${enrollment.student.lastName}`,
+      email: enrollment.student.email,
+      enrollmentDate: enrollment.enrollmentDate
+    }));
+  }
 }
 
 export default new AdminService();

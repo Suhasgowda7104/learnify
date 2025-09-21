@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 
 export interface CourseContent {
@@ -53,6 +52,13 @@ export interface CourseStats {
   active_courses: number;
   total_enrollments: number;
   total_students: number;
+}
+
+export interface EnrolledUser {
+  userId: string;
+  userName: string;
+  email: string;
+  enrollmentDate: string;
 }
 
 @Injectable({
@@ -110,5 +116,9 @@ export class CourseService {
   getCourseEnrollmentCount(courseId: string): Observable<{success: boolean; data: {courseId: string; enrollmentCount: number}}> {
     const headers = this.getAuthHeaders();
     return this.http.get<{success: boolean; data: {courseId: string; enrollmentCount: number}}>(`${this.adminApiUrl}/courses/${courseId}/enrollment-count`, { headers });
+  }
+
+  getCourseEnrolledUsers(courseId: string): Observable<{success: boolean; data: EnrolledUser[]; message?: string}> {
+    return this.http.get<{success: boolean; data: EnrolledUser[]; message?: string}>(`${this.adminApiUrl}/courses/${courseId}/users`, { headers: this.getAuthHeaders() });
   }
 }
