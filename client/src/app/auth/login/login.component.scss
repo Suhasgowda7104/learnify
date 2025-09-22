@@ -14,6 +14,18 @@
   margin-bottom: 3rem;
 }
 
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-logo {
+  height: 110px;
+  width: auto;
+  max-width: 285px;
+}
+
 .brand-title {
   font-size: 2.5rem;
   font-weight: 700;
