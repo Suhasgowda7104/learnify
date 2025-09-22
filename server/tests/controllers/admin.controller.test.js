@@ -1,48 +1,39 @@
 import { jest } from '@jest/globals';
+import sinon from 'sinon';
 
-// Mock the dependencies using ES module mocking
-jest.unstable_mockModule('../../src/models/index.js', () => ({
-  default: {
-    Course: {},
-    User: {},
-    Enrollment: {},
-    CourseContent: {},
-    sequelize: {
-      transaction: jest.fn()
-    }
-  }
-}));
+// Mock express-validator before importing the controller
+const mockValidationResult = jest.fn();
 
-jest.unstable_mockModule('../../src/services/admin.service.js', () => ({
-  default: {
-    createCourse: jest.fn(),
-    updateCourse: jest.fn(),
-    deleteCourse: jest.fn(),
-  }
-}));
-
-jest.unstable_mockModule('express-validator', () => ({
-  validationResult: jest.fn()
+// Use doMock for better ES module support
+jest.doMock('express-validator', () => ({
+  validationResult: mockValidationResult
 }));
 
 // Import after mocking
-const AdminController = (await import('../../src/controllers/admin.controller.js')).default;
-const AdminService = (await import('../../src/services/admin.service.js')).default;
-const { validationResult } = await import('express-validator');
+const { default: AdminController } = await import('../../src/controllers/admin.controller.js');
+const { default: AdminService } = await import('../../src/services/admin.service.js');
+
+let sandbox;
 
 describe('AdminController', () => {
   let req, res;
 
   beforeEach(() => {
+    sandbox = sinon.createSandbox();
     req = {
       body: {},
       params: {}
     };
     res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub()
     };
-    jest.clearAllMocks();
+    // Reset Jest mocks
+    mockValidationResult.mockReset();
+  });
+
+  afterEach(() => {
+    sandbox.restore();
   });
 
   describe('createCourse', () => {
@@ -55,23 +46,20 @@ describe('AdminController', () => {
       courseContent: []
     };
 
-    beforeEach(() => {
-      req.body = mockCourseData;
-    });
-
     it('should create a course successfully', async () => {
       // Arrange
       const mockCourse = { id: 1, ...mockCourseData };
-      validationResult.mockReturnValue({ isEmpty: () => true });
-      AdminService.createCourse.mockResolvedValue(mockCourse);
+      mockValidationResult.mockReturnValue({ isEmpty: () => true });
+      sandbox.stub(AdminService, 'createCourse').resolves(mockCourse);
+      req.body = mockCourseData;
 
       // Act
       await AdminController.createCourse(req, res);
 
       // Assert
-      expect(AdminService.createCourse).toHaveBeenCalledWith(mockCourseData);
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(AdminService.createCourse, mockCourseData);
+      sinon.assert.calledWith(res.status, 201);
+      sinon.assert.calledWith(res.json, {
         success: true,
         message: 'Course created successfully',
         data: mockCourse
@@ -81,18 +69,20 @@ describe('AdminController', () => {
     it('should return validation errors when validation fails', async () => {
       // Arrange
       const mockErrors = [{ field: 'title', message: 'Title is required' }];
-      validationResult.mockReturnValue({
+      const validationResultStub = {
         isEmpty: () => false,
         array: () => mockErrors
-      });
+      };
+      mockValidationResult.mockReturnValue(validationResultStub);
+      sandbox.stub(AdminService, 'createCourse');
 
       // Act
       await AdminController.createCourse(req, res);
 
       // Assert
-      expect(AdminService.createCourse).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.notCalled(AdminService.createCourse);
+      sinon.assert.calledWith(res.status, 400);
+      sinon.assert.calledWith(res.json, {
         success: false,
         message: 'Validation failed',
         errors: mockErrors
@@ -102,42 +92,38 @@ describe('AdminController', () => {
     it('should handle service errors', async () => {
       // Arrange
       const errorMessage = 'Database connection failed';
-      validationResult.mockReturnValue({ isEmpty: () => true });
-      AdminService.createCourse.mockRejectedValue(new Error(errorMessage));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      mockValidationResult.mockReturnValue({ isEmpty: () => true });
+      sandbox.stub(AdminService, 'createCourse').rejects(new Error(errorMessage));
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await AdminController.createCourse(req, res);
 
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith('Create course error:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(consoleSpy, 'Create course error:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 500);
+      sinon.assert.calledWith(res.json, {
         success: false,
         message: errorMessage
       });
-      
-      consoleSpy.mockRestore();
     });
 
     it('should handle unknown errors', async () => {
       // Arrange
-      validationResult.mockReturnValue({ isEmpty: () => true });
-      AdminService.createCourse.mockRejectedValue(new Error());
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      mockValidationResult.mockReturnValue({ isEmpty: () => true });
+      sandbox.stub(AdminService, 'createCourse').rejects(new Error());
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await AdminController.createCourse(req, res);
 
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith('Create course error:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(consoleSpy, 'Create course error:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 500);
+      sinon.assert.calledWith(res.json, {
         success: false,
         message: 'Failed to create course'
       });
-      
-      consoleSpy.mockRestore();
     });
 
     it('should set default isActive to true when not provided', async () => {
@@ -151,15 +137,15 @@ describe('AdminController', () => {
       };
       req.body = courseDataWithoutIsActive;
       const expectedCourseData = { ...courseDataWithoutIsActive, isActive: true };
-      validationResult.mockReturnValue({ isEmpty: () => true });
-      AdminService.createCourse.mockResolvedValue({ id: 1, ...expectedCourseData });
+      mockValidationResult.mockReturnValue({ isEmpty: () => true });
+      sandbox.stub(AdminService, 'createCourse').resolves({ id: 1, ...expectedCourseData });
 
       // Act
       await AdminController.createCourse(req, res);
 
       // Assert
-      expect(AdminService.createCourse).toHaveBeenCalledWith(expectedCourseData);
-      expect(res.status).toHaveBeenCalledWith(201);
+      sinon.assert.calledWith(AdminService.createCourse, expectedCourseData);
+      sinon.assert.calledWith(res.status, 201);
     });
   });
 
@@ -181,16 +167,16 @@ describe('AdminController', () => {
       // Arrange
       const mockUpdatedCourse = { id: 1, ...mockUpdateData };
       const expectedUpdateData = { ...mockUpdateData, courseContent: [] };
-      validationResult.mockReturnValue({ isEmpty: () => true });
-      AdminService.updateCourse.mockResolvedValue(mockUpdatedCourse);
+      mockValidationResult.mockReturnValue({ isEmpty: () => true });
+      sandbox.stub(AdminService, 'updateCourse').resolves(mockUpdatedCourse);
 
       // Act
       await AdminController.updateCourse(req, res);
 
       // Assert
-      expect(AdminService.updateCourse).toHaveBeenCalledWith('1', expectedUpdateData);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(AdminService.updateCourse, '1', expectedUpdateData);
+      sinon.assert.calledWith(res.status, 200);
+      sinon.assert.calledWith(res.json, {
         success: true,
         message: 'Course updated successfully',
         data: mockUpdatedCourse
@@ -200,18 +186,20 @@ describe('AdminController', () => {
     it('should return validation errors when validation fails', async () => {
       // Arrange
       const mockErrors = [{ field: 'price', message: 'Price must be a number' }];
-      validationResult.mockReturnValue({
+      const validationResultStub = {
         isEmpty: () => false,
         array: () => mockErrors
-      });
+      };
+      mockValidationResult.mockReturnValue(validationResultStub);
+      sandbox.stub(AdminService, 'updateCourse');
 
       // Act
       await AdminController.updateCourse(req, res);
 
       // Assert
-      expect(AdminService.updateCourse).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.notCalled(AdminService.updateCourse);
+      sinon.assert.calledWith(res.status, 400);
+      sinon.assert.calledWith(res.json, {
         success: false,
         message: 'Validation failed',
         errors: mockErrors
@@ -220,43 +208,39 @@ describe('AdminController', () => {
 
     it('should handle course not found error', async () => {
       // Arrange
-      validationResult.mockReturnValue({ isEmpty: () => true });
-      AdminService.updateCourse.mockRejectedValue(new Error('Course not found'));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      mockValidationResult.mockReturnValue({ isEmpty: () => true });
+      sandbox.stub(AdminService, 'updateCourse').rejects(new Error('Course not found'));
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await AdminController.updateCourse(req, res);
 
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith('Update course error:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(consoleSpy, 'Update course error:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 404);
+      sinon.assert.calledWith(res.json, {
         success: false,
         message: 'Course not found'
       });
-      
-      consoleSpy.mockRestore();
     });
 
     it('should handle other service errors', async () => {
       // Arrange
       const errorMessage = 'Database update failed';
-      validationResult.mockReturnValue({ isEmpty: () => true });
-      AdminService.updateCourse.mockRejectedValue(new Error(errorMessage));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      mockValidationResult.mockReturnValue({ isEmpty: () => true });
+      sandbox.stub(AdminService, 'updateCourse').rejects(new Error(errorMessage));
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await AdminController.updateCourse(req, res);
 
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith('Update course error:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(consoleSpy, 'Update course error:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 500);
+      sinon.assert.calledWith(res.json, {
         success: false,
         message: errorMessage
       });
-      
-      consoleSpy.mockRestore();
     });
   });
 
@@ -272,15 +256,15 @@ describe('AdminController', () => {
         message: 'Course deleted successfully',
         course: { id: 1, title: 'Deleted Course' }
       };
-      AdminService.deleteCourse.mockResolvedValue(mockResult);
+      sandbox.stub(AdminService, 'deleteCourse').resolves(mockResult);
 
       // Act
       await AdminController.deleteCourse(req, res);
 
       // Assert
-      expect(AdminService.deleteCourse).toHaveBeenCalledWith('1');
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(AdminService.deleteCourse, '1');
+      sinon.assert.calledWith(res.status, 200);
+      sinon.assert.calledWith(res.json, {
         success: true,
         message: 'Course deleted successfully',
         data: { id: 1, title: 'Deleted Course' }
@@ -289,41 +273,37 @@ describe('AdminController', () => {
 
     it('should handle course not found error', async () => {
       // Arrange
-      AdminService.deleteCourse.mockRejectedValue(new Error('Course not found'));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      sandbox.stub(AdminService, 'deleteCourse').rejects(new Error('Course not found'));
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await AdminController.deleteCourse(req, res);
 
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith('Delete course error:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(consoleSpy, 'Delete course error:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 404);
+      sinon.assert.calledWith(res.json, {
         success: false,
         message: 'Course not found'
       });
-      
-      consoleSpy.mockRestore();
     });
 
     it('should handle other service errors', async () => {
       // Arrange
       const errorMessage = 'Database deletion failed';
-      AdminService.deleteCourse.mockRejectedValue(new Error(errorMessage));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      sandbox.stub(AdminService, 'deleteCourse').rejects(new Error(errorMessage));
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await AdminController.deleteCourse(req, res);
 
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith('Delete course error:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(consoleSpy, 'Delete course error:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 500);
+      sinon.assert.calledWith(res.json, {
         success: false,
         message: errorMessage
       });
-      
-      consoleSpy.mockRestore();
     });
 
     it('should handle result without course data', async () => {
@@ -332,14 +312,14 @@ describe('AdminController', () => {
         success: true,
         message: 'Course deleted successfully'
       };
-      AdminService.deleteCourse.mockResolvedValue(mockResult);
+      sandbox.stub(AdminService, 'deleteCourse').resolves(mockResult);
 
       // Act
       await AdminController.deleteCourse(req, res);
 
       // Assert
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
+      sinon.assert.calledWith(res.status, 200);
+      sinon.assert.calledWith(res.json, {
         success: true,
         message: 'Course deleted successfully',
         data: null
