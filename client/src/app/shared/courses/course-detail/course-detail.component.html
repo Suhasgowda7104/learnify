@@ -207,14 +207,15 @@
       
       <div *ngIf="enrolledUsers.length > 0 && !isLoadingEnrolledUsers && !enrolledUsersError" class="users-list">
         <div class="user-item" *ngFor="let user of enrolledUsers">
-          <div class="user-avatar">
-            {{ getUserInitials(user.userName) }}
-          </div>
-          <div class="user-info">
-            <div class="user-name">{{ user.userName }}</div>
-            <div class="user-email">{{ user.email }}</div>
-          </div>
-        </div>
+              <div class="user-avatar">
+                {{ getUserInitials(user.userName) }}
+              </div>
+              <div class="user-info">
+                <div class="user-name">{{ user.userName }}</div>
+                <div class="user-email">{{ user.email }}</div>
+                <div class="user-enrollment-date">Enrolled On: {{ formatDate(user.enrollmentDate) }}</div>
+              </div>
+            </div>
       </div>
       
       <div *ngIf="enrolledUsers.length === 0 && !isLoadingEnrolledUsers && !enrolledUsersError" class="empty-state">
