@@ -1,42 +1,33 @@
-import { jest } from '@jest/globals';
+import sinon from 'sinon';
 
-// Mock the dependencies using ES module mocking
-jest.unstable_mockModule('../../src/services/course.service.js', () => ({
-  default: {
-    getAllActiveCourses: jest.fn(),
-    getCourseById: jest.fn()
-  }
-}));
+let sandbox = null;
 
-jest.unstable_mockModule('../../src/services/student.service.js', () => ({
-  default: {}
-}));
+beforeEach(() => {
+  sandbox = sinon.createSandbox();
+});
 
-jest.unstable_mockModule('../../src/models/index.js', () => ({
-  default: {}
-}));
+afterEach(() => {
+  sandbox.restore();
+}); 
 
-// Import after mocking
 const { getAllCourses, getCourseById } = await import('../../src/controllers/student.controller.js');
 const CourseService = (await import('../../src/services/course.service.js')).default;
 
 describe('Student Controller', () => {
   let req, res;
 
-  beforeEach(() => {
-    req = {
-      params: {},
-      body: {},
-      user: {}
-    };
-    res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis()
-    };
-    jest.clearAllMocks();
-  });
-
   describe('getAllCourses', () => {
+    beforeEach(() => {
+      req = {
+        params: {},
+        body: {},
+        user: {}
+      };
+      res = {
+        status: sinon.stub().returnsThis(),
+        json: sinon.stub().returnsThis()
+      };
+    });
     it('should return all active courses successfully', async () => {
       // Arrange
       const mockCourses = [
@@ -55,50 +46,60 @@ describe('Student Controller', () => {
           status: 'active'
         }
       ];
-      CourseService.getAllActiveCourses.mockResolvedValue(mockCourses);
+      sandbox.stub(CourseService, 'getAllActiveCourses').resolves(mockCourses);
 
       // Act
       await getAllCourses(req, res);
 
       // Assert
-      expect(CourseService.getAllActiveCourses).toHaveBeenCalledTimes(1);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockCourses);
+      sinon.assert.calledOnce(CourseService.getAllActiveCourses);
+      sinon.assert.calledWith(res.status, 200);
+      sinon.assert.calledWith(res.json, mockCourses);
     });
 
     it('should handle errors when fetching courses fails', async () => {
       // Arrange
       const errorMessage = 'Database connection failed';
-      CourseService.getAllActiveCourses.mockRejectedValue(new Error(errorMessage));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      sandbox.stub(CourseService, 'getAllActiveCourses').rejects(new Error(errorMessage));
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await getAllCourses(req, res);
 
       // Assert
-      expect(CourseService.getAllActiveCourses).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith('Error fetching courses:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Failed to fetch courses' });
-      
-      consoleSpy.mockRestore();
+      sinon.assert.calledOnce(CourseService.getAllActiveCourses);
+      sinon.assert.calledWith(consoleSpy, 'Error fetching courses:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 500);
+      sinon.assert.calledWith(res.json, { message: 'Failed to fetch courses' });
     });
 
     it('should return empty array when no courses exist', async () => {
       // Arrange
-      CourseService.getAllActiveCourses.mockResolvedValue([]);
+      sandbox.stub(CourseService, 'getAllActiveCourses').resolves([]);
 
       // Act
       await getAllCourses(req, res);
 
       // Assert
-      expect(CourseService.getAllActiveCourses).toHaveBeenCalledTimes(1);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith([]);
+      sinon.assert.calledOnce(CourseService.getAllActiveCourses);
+      sinon.assert.calledWith(res.status, 200);
+      sinon.assert.calledWith(res.json, []);
     });
   });
 
   describe('getCourseById', () => {
+    beforeEach(() => {
+      req = {
+        params: {},
+        body: {},
+        user: {}
+      };
+      res = {
+        status: sinon.stub().returnsThis(),
+        json: sinon.stub().returnsThis()
+      };
+    });
+
     it('should return course when valid ID is provided', async () => {
       // Arrange
       const courseId = '1';
@@ -111,30 +112,30 @@ describe('Student Controller', () => {
         instructor: 'John Doe'
       };
       req.params.id = courseId;
-      CourseService.getCourseById.mockResolvedValue(mockCourse);
+      sandbox.stub(CourseService, 'getCourseById').resolves(mockCourse);
 
       // Act
       await getCourseById(req, res);
 
       // Assert
-      expect(CourseService.getCourseById).toHaveBeenCalledWith(courseId);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockCourse);
+      sinon.assert.calledWith(CourseService.getCourseById, courseId);
+      sinon.assert.calledWith(res.status, 200);
+      sinon.assert.calledWith(res.json, mockCourse);
     });
 
     it('should return 404 when course is not found', async () => {
       // Arrange
       const courseId = '999';
       req.params.id = courseId;
-      CourseService.getCourseById.mockResolvedValue(null);
+      sandbox.stub(CourseService, 'getCourseById').resolves(null);
 
       // Act
       await getCourseById(req, res);
 
       // Assert
-      expect(CourseService.getCourseById).toHaveBeenCalledWith(courseId);
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Course not found' });
+      sinon.assert.calledWith(CourseService.getCourseById, courseId);
+      sinon.assert.calledWith(res.status, 404);
+      sinon.assert.calledWith(res.json, { message: 'Course not found' });
     });
 
     it('should handle errors when fetching course fails', async () => {
@@ -142,52 +143,48 @@ describe('Student Controller', () => {
       const courseId = '1';
       const errorMessage = 'Database query failed';
       req.params.id = courseId;
-      CourseService.getCourseById.mockRejectedValue(new Error(errorMessage));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      sandbox.stub(CourseService, 'getCourseById').rejects(new Error(errorMessage));
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await getCourseById(req, res);
 
       // Assert
-      expect(CourseService.getCourseById).toHaveBeenCalledWith(courseId);
-      expect(consoleSpy).toHaveBeenCalledWith('Error fetching course:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Failed to fetch course' });
-      
-      consoleSpy.mockRestore();
+      sinon.assert.calledWith(CourseService.getCourseById, courseId);
+      sinon.assert.calledWith(consoleSpy, 'Error fetching course:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 500);
+      sinon.assert.calledWith(res.json, { message: 'Failed to fetch course' });
     });
 
     it('should handle invalid course ID format', async () => {
       // Arrange
       const invalidCourseId = 'invalid-id';
       req.params.id = invalidCourseId;
-      CourseService.getCourseById.mockRejectedValue(new Error('Invalid ID format'));
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      sandbox.stub(CourseService, 'getCourseById').rejects(new Error('Invalid ID format'));
+      const consoleSpy = sandbox.stub(console, 'error');
 
       // Act
       await getCourseById(req, res);
 
       // Assert
-      expect(CourseService.getCourseById).toHaveBeenCalledWith(invalidCourseId);
-      expect(consoleSpy).toHaveBeenCalledWith('Error fetching course:', expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Failed to fetch course' });
-      
-      consoleSpy.mockRestore();
+      sinon.assert.calledWith(CourseService.getCourseById, invalidCourseId);
+      sinon.assert.calledWith(consoleSpy, 'Error fetching course:', sinon.match.instanceOf(Error));
+      sinon.assert.calledWith(res.status, 500);
+      sinon.assert.calledWith(res.json, { message: 'Failed to fetch course' });
     });
 
     it('should handle undefined course ID', async () => {
       // Arrange
       req.params = {}; // No id parameter
-      CourseService.getCourseById.mockResolvedValue(null);
+      sandbox.stub(CourseService, 'getCourseById').resolves(null);
 
       // Act
       await getCourseById(req, res);
 
       // Assert
-      expect(CourseService.getCourseById).toHaveBeenCalledWith(undefined);
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Course not found' });
+      sinon.assert.calledWith(CourseService.getCourseById, undefined);
+      sinon.assert.calledWith(res.status, 404);
+      sinon.assert.calledWith(res.json, { message: 'Course not found' });
     });
   });
 });

@@ -1,21 +1,25 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { CourseListComponent } from './courses/course-list/course-list.component';
 import { CourseDetailComponent } from './courses/course-detail/course-detail.component';
+import { CourseSearchPipe } from './pipes/course-search.pipe';
 
 @NgModule({
   declarations: [
     HeaderComponent,
     FooterComponent,
     CourseListComponent,
-    CourseDetailComponent
+    CourseDetailComponent,
+    CourseSearchPipe
   ],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    FormsModule
   ],
   exports: [
     HeaderComponent,

@@ -19,7 +19,7 @@ export class StudentDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
-    console.log('✅ Student Dashboard - Current user:', this.currentUser);
+    console.log('Student Dashboard - Current user:', this.currentUser);
     
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);
