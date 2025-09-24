@@ -20,6 +20,7 @@ export class CourseListComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   enrolledCourseIds: Set<string> = new Set();
+  searchTerm: string = '';
   constructor(
     private courseService: CourseService,
     private authService: AuthService,
@@ -157,5 +158,14 @@ export class CourseListComponent implements OnInit {
 
   isEnrolledInCourse(courseId: string): boolean {
     return this.enrolledCourseIds.has(courseId);
+  }
+
+  onSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm = target.value;
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
   }
 }
