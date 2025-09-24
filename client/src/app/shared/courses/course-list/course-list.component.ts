@@ -20,7 +20,6 @@ export class CourseListComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   enrolledCourseIds: Set<string> = new Set();
-  searchTerm: string = '';
   constructor(
     private courseService: CourseService,
     private authService: AuthService,
@@ -39,14 +38,6 @@ export class CourseListComponent implements OnInit {
     if (this.isStudent && !this.showEnrolledOnly) {
       this.loadEnrollmentStatus();
     }
-  }
-
-  onSearchChange(event: any) {
-    this.searchTerm = event.target.value;
-  }
-
-  clearSearch() {
-    this.searchTerm = '';
   }
 
 

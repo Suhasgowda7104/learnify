@@ -6,7 +6,7 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { CourseListComponent } from './courses/course-list/course-list.component';
 import { CourseDetailComponent } from './courses/course-detail/course-detail.component';
-import { CourseSearchPipe } from './pipes/course-search.pipe';
+import { SearchPipe } from './pipes/search.pipe';
 
 @NgModule({
   declarations: [
@@ -14,7 +14,7 @@ import { CourseSearchPipe } from './pipes/course-search.pipe';
     FooterComponent,
     CourseListComponent,
     CourseDetailComponent,
-    CourseSearchPipe
+    SearchPipe
   ],
   imports: [
     CommonModule,
