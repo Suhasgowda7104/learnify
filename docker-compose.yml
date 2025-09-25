@@ -1,0 +1,41 @@
+services:
+  # Node.js Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: learnify-server
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: host.docker.internal
+      DB_PORT: 5432
+      DB_NAME: learnify
+      DB_USER: postgres
+      DB_PASSWORD: root
+    ports:
+      - "5000:5000"
+    networks:
+      - learnify-network
+    restart: unless-stopped
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  # Angular Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: learnify-client
+    ports:
+      - "8081:80"
+    depends_on:
+      - server
+    networks:
+      - learnify-network
+    restart: unless-stopped
+
+networks:
+  learnify-network:
+    driver: bridge

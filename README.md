@@ -19,6 +19,10 @@
 4. 🤸 [Quick Start](#quick-start)
 5. 🏗️ [Project Structure](#project-structure)
 6. 📝 [API Endpoints](#api-endpoints)
+7. 🧪 [Testing](#testing)
+8. 🐳 [Docker Setup](#docker-setup)
+9. 🚀 [Deployment](#deployment)
+10. 🤝 [Contributing](#contributing)
 
 ## <a name="introduction">🤖 Introduction</a>
 
@@ -216,6 +220,63 @@ npm test
 ```bash
 cd client
 ng test
+```
+
+## <a name="docker-setup">🐳 Docker Setup</a>
+
+Run the Learnify application using Docker and Docker Compose for a containerized development environment.
+
+**Prerequisites**
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) installed and running
+- Docker Compose (included with Docker Desktop)
+
+**Quick Docker Start**
+
+```bash
+# Clone the repository (if not already done)
+git clone https://github.com/Suhasgowda7104/learnify.git
+cd learnify
+
+# Start all services with Docker Compose
+docker-compose up -d
+
+# Access the application
+# Frontend: http://localhost:8081
+# Backend API: http://localhost:5000
+# Database: localhost:5432
+
+# Stop all services
+docker-compose down
+```
+
+**Docker Architecture**
+
+👉 **Client (Angular + Nginx)**: Frontend application containerized with optimized production build
+
+👉 **Server (Node.js)**: Backend API with health checks and non-root user security
+
+👉 **Database Connection**: Connects to your local PostgreSQL database using `host.docker.internal`
+
+👉 **Network**: All services communicate through `learnify-network` with internal DNS resolution
+
+**Docker Commands**
+
+```bash
+# View logs for all services
+docker-compose logs -f
+
+# Restart a specific service
+docker-compose restart server
+
+# Rebuild and start services
+docker-compose up --build
+
+# View container status
+docker-compose ps
+
+# Remove containers and volumes (careful: deletes data)
+docker-compose down -v
 ```
 
 ## 🚀 Deployment
