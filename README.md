@@ -1,10 +1,11 @@
 <div align="center">
   <div>
     <img src="https://img.shields.io/badge/-Angular-black?style=for-the-badge&logoColor=white&logo=angular&color=DD0031" alt="angular" />
+    <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="typescript" />
     <img src="https://img.shields.io/badge/-Node.js-black?style=for-the-badge&logoColor=white&logo=nodedotjs&color=339933" alt="nodejs" />
     <img src="https://img.shields.io/badge/-Express.js-black?style=for-the-badge&logoColor=white&logo=express&color=000000" alt="expressjs" />
     <img src="https://img.shields.io/badge/-PostgreSQL-black?style=for-the-badge&logoColor=white&logo=postgresql&color=336791" alt="postgresql" />
-    <img src="https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="typescript" />
+    <img src="https://img.shields.io/badge/-Docker-black?style=for-the-badge&logoColor=white&logo=docker&color=2496ED" alt="docker" />
   </div>
 
   <h1 align="center">Learnify</h1>
@@ -22,7 +23,6 @@
 7. 🧪 [Testing](#testing)
 8. 🐳 [Docker Setup](#docker-setup)
 9. 🚀 [Deployment](#deployment)
-10. 🤝 [Contributing](#contributing)
 
 ## <a name="introduction">🤖 Introduction</a>
 
@@ -266,14 +266,14 @@ docker-compose down
 # View logs for all services
 docker-compose logs -f
 
-# Restart a specific service
-docker-compose restart server
-
 # Rebuild and start services
 docker-compose up --build
 
 # View container status
 docker-compose ps
+
+# Restart a specific service
+docker-compose restart server
 
 # Remove containers and volumes (careful: deletes data)
 docker-compose down -v
@@ -294,14 +294,6 @@ docker-compose down -v
    ng build --prod
    ```
 2. Deploy the `dist/` folder to your web server
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
 
 ---
 
