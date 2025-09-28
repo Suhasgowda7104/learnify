@@ -341,10 +341,7 @@ main {
   gap: var(--space-2);
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+
 
 .enrollment-info,
 .login-info {
@@ -1056,7 +1053,7 @@ main {
     }
 
     .modal-body {
-      padding: 1.5rem;
+      padding: 1rem;
       max-height: 60vh;
       overflow-y: auto;
 
@@ -1089,14 +1086,63 @@ main {
 
       .empty-state {
         text-align: center;
-        padding: 2rem;
+        padding: 1rem;
         color: #6c757d;
 
         .empty-icon {
           font-size: 2rem;
           margin-bottom: 1rem;
         }
+
+        .warning-icon {
+          width: 3rem;
+          height: 3rem;
+          margin: 0 auto 0.75rem;
+          color: #f59e0b;
+          background: #fef3c7;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          svg {
+            width: 1.5rem;
+            height: 1.5rem;
+          }
+        }
+
+        h4 {
+          margin: 0 0 0.5rem;
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #374151;
+        }
+
+        p {
+          margin: 0 0 1rem;
+          font-size: 0.875rem;
+        }
+
+        .confirmation-actions {
+          display: flex;
+          gap: 0.75rem;
+          justify-content: center;
+          margin-top: 1rem;
+
+          .btn-destructive {
+            background-color: #dc2626;
+            color: white;
+            border-color: #dc2626;
+
+            &:hover:not(:disabled) {
+              background-color: #b91c1c;
+              border-color: #b91c1c;
+            }
+          }
+        }
       }
+
+
 
       .users-list {
         max-height: 216px;
@@ -1170,6 +1216,19 @@ main {
         }
       }
     }
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 

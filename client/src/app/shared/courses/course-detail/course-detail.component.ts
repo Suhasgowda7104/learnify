@@ -25,6 +25,10 @@ export class CourseDetailComponent implements OnInit {
   enrolledUsers: EnrolledUser[] = [];
   isLoadingEnrolledUsers = false;
   enrolledUsersError = '';
+  
+  // Delete confirmation modal properties
+  showDeleteConfirmModal = false;
+  isDeletingCourse = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -88,20 +92,32 @@ export class CourseDetailComponent implements OnInit {
   }
 
   deleteCourse(): void {
-    if (this.course?.id && confirm('Are you sure you want to delete this course?')) {
-      this.courseService.deleteCourse(this.course.id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.router.navigate(['/admin']);
-          }
-        },
-        error: (error) => {
-          console.error('Error deleting course:', error);
-          alert('Failed to delete course');
-        }
-      });
-    }
+    this.showDeleteConfirmModal = true;
   }
+  
+  closeDeleteConfirmModal(): void {
+    this.showDeleteConfirmModal = false;
+  }
+  
+  confirmDeleteCourse(): void {
+    this.isDeletingCourse = true;
+    this.courseService.deleteCourse(this.course!.id).subscribe({
+      next: (response) => {
+        this.isDeletingCourse = false;
+        this.showDeleteConfirmModal = false;
+        if (response.success) {
+          this.router.navigate(['/admin']);
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting course:', error);
+        this.isDeletingCourse = false;
+        alert('Error deleting course. Please try again.');
+      }
+    });
+  }
+  
+
 
   checkEnrollmentStatus(courseId: string): void {
     this.enrollmentService.isEnrolledInCourse(courseId).subscribe({
