@@ -6,9 +6,6 @@ This directory contains database migration files for the Learnify project.
 
 1. **001_create_roles.migration.js** - Creates the roles table with default admin and student roles
 2. **002_create_users.migration.js** - Creates the users table with foreign key to roles
-3. **003_create_courses.migration.js** - Creates the courses table
-4. **004_create_course_contents.migration.js** - Creates the course_contents table with foreign key to courses
-5. **005_create_enrollments.migration.js** - Creates the enrollments table with foreign keys to users and courses
 
 ## Running Migrations
 

@@ -1,12 +1,11 @@
-import CourseService from '../services/course.service.js';
-import studentService from '../services/student.service.js';
+import StudentService from '../services/student.service.js';
 import db from '../models/index.js';
 
 const { CourseContent } = db;
 
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await CourseService.getAllActiveCourses();
+    const courses = await StudentService.getAllActiveCourses();
     res.status(200).json(courses);
   } catch (err) {
     console.error("Error fetching courses:", err);
@@ -18,7 +17,7 @@ export const getCourseById = async (req, res) => {
    const { id } = req.params;
 
   try {
-    const course = await CourseService.getCourseById(id);
+    const course = await StudentService.getCourseById(id);
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
