@@ -1,0 +1,85 @@
+{
+  "testSummary": {
+    "totalTestSuites": 2,
+    "passedTestSuites": 2,
+    "failedTestSuites": 0,
+    "totalTests": 21,
+    "passedTests": 21,
+    "failedTests": 0,
+    "pendingTests": 0,
+    "success": true,
+    "executionTime": "1.476s"
+  },
+  "testSuites": [
+    {
+      "name": "Student Controller",
+      "file": "tests/controllers/student.controller.test.js",
+      "status": "passed",
+      "tests": [
+        {
+          "group": "getAllCourses",
+          "tests": [
+            "should return all active courses successfully",
+            "should handle errors when fetching courses fails",
+            "should return empty array when no courses exist"
+          ]
+        },
+        {
+          "group": "getCourseById",
+          "tests": [
+            "should return course when valid ID is provided",
+            "should return 404 when course is not found",
+            "should handle errors when fetching course fails",
+            "should handle invalid course ID format",
+            "should handle undefined course ID"
+          ]
+        }
+      ],
+      "totalTests": 8,
+      "passedTests": 8
+    },
+    {
+      "name": "Admin Controller",
+      "file": "tests/controllers/admin.controller.test.js",
+      "status": "passed",
+      "tests": [
+        {
+          "group": "createCourse",
+          "tests": [
+            "should create a course successfully",
+            "should return validation errors when validation fails",
+            "should handle service errors",
+            "should handle unknown errors",
+            "should set default isActive to true when not provided"
+          ]
+        },
+        {
+          "group": "updateCourse",
+          "tests": [
+            "should update a course successfully",
+            "should return validation errors when validation fails",
+            "should handle course not found error",
+            "should handle other service errors"
+          ]
+        },
+        {
+          "group": "deleteCourse",
+          "tests": [
+            "should delete a course successfully",
+            "should handle course not found error",
+            "should handle other service errors",
+            "should handle result without course data"
+          ]
+        }
+      ],
+      "totalTests": 13,
+      "passedTests": 13
+    }
+  ],
+  "coverage": {
+    "statements": "39.13%",
+    "branches": "31.18%",
+    "functions": "40.47%",
+    "lines": "39.64%"
+  }
+}

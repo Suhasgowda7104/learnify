@@ -1,0 +1,222 @@
+{
+  "testSummary": {
+    "totalTests": 50,
+    "passedTests": 40,
+    "failedTests": 10,
+    "executionTime": "0.551 secs",
+    "testFramework": "Jasmine with Karma",
+    "browser": "Chrome Headless 139.0.0.0 (Windows 10)",
+    "status": "FAILED"
+  },
+  "coverage": {
+    "statements": "8.5% (50/588)",
+    "branches": "1.68% (4/238)",
+    "functions": "6.74% (12/178)",
+    "lines": "8.29% (48/579)"
+  },
+  "testSuites": {
+    "AppComponent": {
+      "testFile": "src/app/app.component.spec.ts",
+      "tests": [
+        {
+          "name": "should create the app",
+          "status": "PASSED"
+        },
+        {
+          "name": "should have as title 'client'",
+          "status": "PASSED"
+        },
+        {
+          "name": "should render title",
+          "status": "PASSED"
+        }
+      ]
+    },
+    "Services": {
+      "AuthService": {
+        "testFile": "src/app/services/auth/auth.service.spec.ts",
+        "tests": [
+          {
+            "name": "should be created",
+            "status": "FAILED",
+            "error": "NullInjectorError: No provider for HttpClient"
+          }
+        ]
+      },
+      "UserService": {
+        "testFile": "src/app/services/user/user.service.spec.ts",
+        "tests": [
+          {
+            "name": "should be created",
+            "status": "FAILED",
+            "error": "NullInjectorError: No provider for HttpClient"
+          }
+        ]
+      },
+      "CourseService": {
+        "testFile": "src/app/services/course/course.service.spec.ts",
+        "tests": [
+          {
+            "name": "should be created",
+            "status": "FAILED",
+            "error": "NullInjectorError: No provider for HttpClient"
+          }
+        ]
+      },
+      "EnrollmentService": {
+        "testFile": "src/app/services/enrollment/enrollment.service.spec.ts",
+        "tests": [
+          {
+            "name": "should be created",
+            "status": "FAILED",
+            "error": "NullInjectorError: No provider for HttpClient"
+          }
+        ]
+      }
+    },
+    "Components": {
+      "HeaderComponent": {
+        "testFile": "src/app/shared/header/header.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "PASSED"
+          }
+        ]
+      },
+      "FooterComponent": {
+        "testFile": "src/app/shared/footer/footer.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "PASSED"
+          }
+        ]
+      },
+      "CourseListComponent": {
+        "testFile": "src/app/shared/courses/course-list/course-list.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "PASSED"
+          }
+        ]
+      },
+      "CourseDetailComponent": {
+        "testFile": "src/app/shared/courses/course-detail/course-detail.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "PASSED"
+          }
+        ]
+      },
+      "LoginComponent": {
+        "testFile": "src/app/auth/login/login.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "FAILED",
+            "error": "NullInjectorError: No provider for HttpClient"
+          }
+        ]
+      },
+      "RegisterComponent": {
+        "testFile": "src/app/auth/register/register.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "FAILED",
+            "error": "NullInjectorError: No provider for HttpClient"
+          }
+        ]
+      },
+      "CourseFormComponent": {
+        "testFile": "src/app/admin/course-form/course-form.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "PASSED"
+          }
+        ]
+      }
+    },
+    "DashboardComponents": {
+      "AdminDashboardComponent": {
+        "testFile": "src/app/admin/admin-dashboard/admin-dashboard.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "PASSED"
+          },
+          {
+            "name": "should initialize with current user",
+            "status": "PASSED"
+          },
+          {
+            "name": "should handle user with admin role",
+            "status": "PASSED"
+          },
+          {
+            "name": "should handle user with student role",
+            "status": "PASSED"
+          },
+          {
+            "name": "should handle null user",
+            "status": "PASSED"
+          }
+        ]
+      },
+      "StudentDashboardComponent": {
+        "testFile": "src/app/student/student-dashboard/student-dashboard.component.spec.ts",
+        "tests": [
+          {
+            "name": "should create",
+            "status": "PASSED"
+          },
+          {
+            "name": "should initialize with current user",
+            "status": "PASSED"
+          },
+          {
+            "name": "should handle authentication check",
+            "status": "PASSED"
+          },
+          {
+            "name": "should handle logout functionality",
+            "status": "PASSED"
+          }
+        ]
+      }
+    }
+  },
+  "failureReasons": [
+    {
+      "type": "Dependency Injection Error",
+      "description": "Missing HttpClient provider in test modules",
+      "affectedTests": [
+        "AuthService",
+        "UserService", 
+        "CourseService",
+        "EnrollmentService",
+        "LoginComponent",
+        "RegisterComponent"
+      ],
+      "solution": "Add HttpClientTestingModule to TestBed imports"
+    }
+  ],
+  "testConfiguration": {
+    "testRunner": "Angular CLI with Karma",
+    "testFramework": "Jasmine",
+    "browser": "Chrome Headless",
+    "configFile": "angular.json",
+    "testPattern": "**/*.spec.ts",
+    "setupFiles": ["zone.js", "zone.js/testing"]
+  },
+  "generatedFiles": [
+    {
+      "name": "test-results-summary.json",
+      "description": "Simplified test results summary for client-side Angular tests"
+    }
+  ]
+}
