@@ -73,106 +73,10 @@ export const authenticateToken = async (req, res, next) => {
 };
 
 /**
- * Middleware to check if user has specific role
- */
-export const requireRole = (roleName) => {
-  return (req, res, next) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({
-          success: false,
-          message: 'Authentication required'
-        });
-      }
-
-      if (!req.user.role) {
-        return res.status(403).json({
-          success: false,
-          message: 'User role not found'
-        });
-      }
-
-      if (req.user.role.name !== roleName) {
-        return res.status(403).json({
-          success: false,
-          message: `Access denied. ${roleName} role required`
-        });
-      }
-
-      next();
-    } catch (error) {
-      console.error('Role verification error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Internal server error in role verification'
-      });
-    }
-  };
-};
-
-/**
- * Middleware to check if user has any of the specified roles
- */
-export const requireAnyRole = (roleNames) => {
-  return (req, res, next) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({
-          success: false,
-          message: 'Authentication required'
-        });
-      }
-
-      if (!req.user.role) {
-        return res.status(403).json({
-          success: false,
-          message: 'User role not found'
-        });
-      }
-
-      if (!roleNames.includes(req.user.role.name)) {
-        return res.status(403).json({
-          success: false,
-          message: `Access denied. One of these roles required: ${roleNames.join(', ')}`
-        });
-      }
-
-      next();
-    } catch (error) {
-      console.error('Role verification error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Internal server error in role verification'
-      });
-    }
-  };
-};
-
-/**
  * Middleware to check if user is admin
  */
-export const requireAdmin = requireRole('admin');
-
-/**
- * Middleware to check if user is instructor
- */
-export const requireInstructor = requireRole('instructor');
-
-/**
- * Middleware to check if user is student
- */
-export const requireStudent = requireRole('student');
-
-/**
- * Middleware to check if user is instructor or admin
- */
-export const requireInstructorOrAdmin = requireAnyRole(['instructor', 'admin']);
-
-/**
- * Middleware to check if user owns the resource or is admin
- */
-export const requireOwnershipOrAdmin = (userIdField = 'user_id') => {
-  return (req, res, next) => {
+export const requireAdmin = (req, res, next) => {
+  try {
     if (!req.user) {
       return res.status(401).json({
         success: false,
@@ -180,65 +84,68 @@ export const requireOwnershipOrAdmin = (userIdField = 'user_id') => {
       });
     }
 
-    // Admin can access everything
-    if (req.user.role.name === 'admin') {
-      return next();
-    }
-
-    // Check if user owns the resource
-    const resourceUserId = req.params[userIdField] || req.body[userIdField];
-    
-    if (req.user.id !== resourceUserId) {
+    if (!req.user.role) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied. You can only access your own resources'
+        message: 'User role not found'
+      });
+    }
+
+    if (req.user.role.name !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin role required'
       });
     }
 
     next();
-  };
+  } catch (error) {
+    console.error('Role verification error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error in role verification'
+    });
+  }
 };
 
 /**
- * Optional authentication middleware - doesn't fail if no token provided
+ * Middleware to check if user is student
  */
-export const optionalAuth = async (req, res, next) => {
+export const requireStudent = (req, res, next) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-      req.user = null;
-      return next();
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
     }
 
-    const decoded = jwt.verify(token, jwtConfig.secret);
-    const user = await User.findByPk(decoded.userId, {
-      include: [{
-        model: Role,
-        as: 'role',
-        attributes: ['id', 'name']
-      }],
-      attributes: { exclude: ['password'] }
-    });
+    if (!req.user.role) {
+      return res.status(403).json({
+        success: false,
+        message: 'User role not found'
+      });
+    }
 
-    req.user = user && user.isActive ? user : null;
+    if (req.user.role.name !== 'student') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Student role required'
+      });
+    }
+
     next();
   } catch (error) {
-    // If token is invalid, just continue without user
-    req.user = null;
-    next();
+    console.error('Role verification error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error in role verification'
+    });
   }
 };
 
 export default {
   authenticateToken,
-  requireRole,
-  requireAnyRole,
   requireAdmin,
-  requireInstructor,
-  requireStudent,
-  requireInstructorOrAdmin,
-  requireOwnershipOrAdmin,
-  optionalAuth
+  requireStudent
 };
